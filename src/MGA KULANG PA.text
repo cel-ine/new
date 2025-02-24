@@ -1,0 +1,35 @@
+TO DEBUG: 
+
+**HOMEPAGE:**
+
+- account settings
+- changing pfp
+- updating password
+- UI
+
+**ACCOUNT MANAGER:** 
+
+- update table view nasa email col ung un
+- 
+
+**ROUTES MANAGER (incl. alt routes + travel time)** 
+
+- Add new saved routes (pop-up pane) ✅
+- database cities ✅
+- delete for 3 tables (alt routes, travel time) ✅
+- add for 3 tables (sa database handler) ✅
+- update for 3 tables (incl. alt routes + travel time)
+    - the update should have validation (ung ipapalit must be pasok lang sa locationList)
+    - stop over location should be editable 
+- add routes (pag mag type is may lalabas na same)
+- SEARCH FUNCTION 
+
+**PLANNED DRIVES:**
+- table view
+- pop up pane
+- combobox for startpoint
+- combobox endpoint
+- time
+- Add
+- delete
+- update 
