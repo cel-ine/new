@@ -11,7 +11,7 @@ public class DatabaseHandler {
     private static DatabaseHandler handler = null;
     private static Connection connection = null;
 
-    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/WazeApp?useSSL=false&serverTimezone=UTC";
+    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/WazeApp?useSSL=false&serverTimezone=Asia/Manila";
     private static final String USER = "root";
     private static final String PASSWORD = "ilovecompsci"; // Change if needed
 
@@ -68,6 +68,62 @@ public class DatabaseHandler {
             e.printStackTrace();
         }
     }
+
+    //LOAD
+    public static ObservableList<String> loadUsernames() {
+        ObservableList<String> accountList = FXCollections.observableArrayList();
+        String query = "SELECT account_id, username FROM WazeAccounts WHERE role != 'admin'";
+
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                int accountID = rs.getInt("account_id");
+                String username = rs.getString("username");
+                accountList.add(accountID + " - " + username);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading account data: " + e.getMessage());
+        }
+        return accountList;
+    }
+
+    public static ObservableList<String> loadLocations() {
+        ObservableList<String> locationList = FXCollections.observableArrayList();
+        String query = "SELECT name FROM locations ORDER BY name ASC";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                locationList.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading locations: " + e.getMessage());
+        }
+        return locationList;
+    }
+
+    public static ObservableList<String> loadStopovers() {
+        ObservableList<String> stopoverList = FXCollections.observableArrayList();
+        String query = "SELECT name FROM StopoverLocations";
+
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                stopoverList.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading stopovers: " + e.getMessage());
+        }
+        return stopoverList;
+    }
+
+
 
     // 🌮🌮🌮 DASHBOARD DISPLAY
     public static ObservableList<AdminUser> displayUsers() {
@@ -230,7 +286,7 @@ public class DatabaseHandler {
     }
     public static boolean updateUserDetails(AdminUser user) {
         String updateUser = "UPDATE wazeaccounts SET email = ?, username = ?, passwords = ?, first_name = ?, last_name = ? WHERE account_id = ?";
-        Connection conn = null; // Declare it outside try-catch
+        Connection conn = null; 
     
         try {
             conn = DatabaseHandler.getConnection();
@@ -368,77 +424,59 @@ public class DatabaseHandler {
         }
     }
     public static boolean updateRoute(AdminRoutes route) {
-        Connection conn = null;
-        PreparedStatement pstmtRoutes = null;
-        PreparedStatement pstmtAltRoutes = null;
+        if (route == null || route.getRouteID() == null) {
+            System.out.println("❌ Error: Invalid route. Cannot update.");
+            return false;
+        }
+    
         boolean success = false;
+        
+        String updateRoutesQuery = "UPDATE WazeRoutes SET route_startpoint = ?, route_endpoint = ? WHERE route_id = ?";
+        String updateAltRoutesQuery = "UPDATE WazeAltRoutes SET stop_overloc = ? WHERE route_id = ?";
+        
+        try (Connection conn = DatabaseHandler.getConnection();
+             PreparedStatement pstmtRoutes = conn.prepareStatement(updateRoutesQuery);
+             PreparedStatement pstmtAltRoutes = conn.prepareStatement(updateAltRoutesQuery)) {
+            
+            conn.setAutoCommit(false);
     
-        try {
-            conn = DatabaseHandler.getConnection();
-            conn.setAutoCommit(false); // Start transaction
-    
-            // Update WazeRoutes (Start and End Points)
-            String updateRoutesQuery = "UPDATE WazeRoutes SET route_startpoint = ?, route_endpoint = ? WHERE route_id = ?";
-            pstmtRoutes = conn.prepareStatement(updateRoutesQuery);
             pstmtRoutes.setString(1, route.getRoute_startpoint());
             pstmtRoutes.setString(2, route.getRoute_endpoint());
             pstmtRoutes.setString(3, route.getRouteID().trim());
-            int rowsAffectedRoutes = pstmtRoutes.executeUpdate();
     
-            // Update WazeAltRoutes (StopOver)
-            String updateAltRoutesQuery = "UPDATE WazeAltRoutes SET stop_overloc = ? WHERE route_id = ?";
-            pstmtAltRoutes = conn.prepareStatement(updateAltRoutesQuery);
             pstmtAltRoutes.setString(1, route.getStopOver());
             pstmtAltRoutes.setString(2, route.getRouteID().trim());
+    
+            int rowsAffectedRoutes = pstmtRoutes.executeUpdate();
             int rowsAffectedAltRoutes = pstmtAltRoutes.executeUpdate();
     
-            // Commit if both updates succeed
-            if (rowsAffectedRoutes > 0 && rowsAffectedAltRoutes > 0) {
+            if (rowsAffectedRoutes > 0 || rowsAffectedAltRoutes > 0) {
                 conn.commit();
                 success = true;
+                System.out.println("Route update successful.");
             } else {
-                conn.rollback(); // Rollback if either update fails
+                System.out.println("No update made. Check route ID & values.");
             }
-    
         } catch (SQLException e) {
-            System.err.println("Error updating route: " + e.getMessage());
-            e.printStackTrace();
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Ensure rollback on failure
-                } catch (SQLException rollbackEx) {
-                    rollbackEx.printStackTrace();
-                }
-            }
-        } finally {
-            // Close resources
-            try {
-                if (pstmtRoutes != null) pstmtRoutes.close();
-                if (pstmtAltRoutes != null) pstmtAltRoutes.close();
-                if (conn != null) conn.setAutoCommit(true);
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            System.err.println("❌ SQL Error updating route: " + e.getMessage());
         }
-    
+        
         return success;
     }
     
-
-
-    //🎀🎀🎀 PLANNED DRUVES
+    
+    //🎀🎀🎀 PLANNED DRIVES
     public static boolean addPlannedDrive(AdminPlannedDrives newPlannedDrive) {
-        String query = "INSERT INTO WazePlannedDrives (account_id, planned_date, planned_time, start_loc, pinned_loc) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO WazePlannedDrives (account_id, planned_date, planned_time, start_loc, pinned_loc) VALUES (?, ?, ?, ?, ?)";
         
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
     
-            pstmt.setInt(1, newPlannedDrive.getAccount_id()); // ✅ Set account_id
-            pstmt.setDate(2, java.sql.Date.valueOf(newPlannedDrive.getPlannedDate())); // ✅ Convert LocalDate to SQL Date
-            pstmt.setTime(3, java.sql.Time.valueOf(newPlannedDrive.getPlannedTime())); // ✅ Convert LocalTime to SQL Time
-            pstmt.setString(4, newPlannedDrive.getStartLoc()); // ✅ Add start_loc
-            pstmt.setString(5, newPlannedDrive.getPinnedLoc()); // ✅ Set pinned_loc
+            pstmt.setInt(1, newPlannedDrive.getAccount_id()); 
+            pstmt.setDate(2, java.sql.Date.valueOf(newPlannedDrive.getPlannedDate())); 
+            pstmt.setTime(3, java.sql.Time.valueOf(newPlannedDrive.getPlannedTime())); 
+            pstmt.setString(4, newPlannedDrive.getStartLoc()); 
+            pstmt.setString(5, newPlannedDrive.getPinnedLoc()); 
     
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
@@ -450,7 +488,7 @@ public class DatabaseHandler {
     }    
 
     public static boolean deletePlannedDrive(int plannedDriveID) {
-        String query = "DELETE FROM PlannedDrives WHERE planneddrive_id = ?";
+        String query = "DELETE FROM WazePlannedDrives WHERE planneddrive_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, plannedDriveID);
@@ -464,11 +502,15 @@ public class DatabaseHandler {
     }
 
     public static boolean updatePlannedDrive(AdminPlannedDrives plannedDrive) {
-        String query = "UPDATE PlannedDrives SET pinned_loc = ? WHERE planneddrive_id = ?";
+        String query = "UPDATE WazePlannedDrives SET pinned_loc = ?, start_loc = ?, planned_date = ?, planned_time  = ? WHERE planneddrive_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, plannedDrive.getPinnedLoc());
-            pstmt.setInt(2, plannedDrive.getPlannedDriveID());
+            pstmt.setString(2, plannedDrive.getStartLoc());
+            pstmt.setObject(3, plannedDrive.getPlannedDate()); // No timezone shifts
+            pstmt.setTime(4, java.sql.Time.valueOf(plannedDrive.getPlannedTime())); 
+            pstmt.setInt(5, plannedDrive.getPlannedDriveID());
+
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {

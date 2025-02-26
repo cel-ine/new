@@ -19,8 +19,8 @@ public class LoginController {
 
     @FXML private Button SignUpButton, SignInButton;
 
-    private Stage stage;
-    private Scene scene;
+    // private Stage stage;
+    // private Scene scene;
     private Parent root;
 
     @FXML

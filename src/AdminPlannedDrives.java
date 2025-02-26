@@ -77,4 +77,9 @@ public class AdminPlannedDrives {
     public void setPinnedLoc(String pinnedLoc) {
         this.pinnedLoc = pinnedLoc;
     }
+
+    // public void setEndLocation(String endLoc) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'setEndLocation'");
+    // }
 }

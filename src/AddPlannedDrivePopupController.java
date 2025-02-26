@@ -4,116 +4,78 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class AddPlannedDrivePopupController {
-    @FXML private ComboBox<String> accountIDComboBox1, prefTimeCombobox;
+    @FXML private ComboBox<String> accountIDComboBox1, startComboBox, endComboBox;
     @FXML private DatePicker calendarPicker;
-    @FXML private TextField pinnedLocTF, startLocTF;
+    @FXML private TextField prefTimeTextField;
     @FXML private Button savePlannedDriveBTN;
 
     private AdminHomepageController adminHomepageController;
     
     private ObservableList<String> timeList = FXCollections.observableArrayList();
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
-    private ObservableList<String> accountIDs = FXCollections.observableArrayList();
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private ObservableList<String> locationList = FXCollections.observableArrayList();
 
-    // Set reference of AdminHomepageController
     public void setAdminHomepageController(AdminHomepageController adminHomepageController) {
         this.adminHomepageController = adminHomepageController;
     }
 
     @FXML
     public void initialize() {
-        populateTimeList(); // Load all times into ComboBox
-        prefTimeCombobox.setItems(timeList);
-        prefTimeCombobox.setEditable(true); // Enable text input
+        accountIDComboBox1.setItems(AdminService.getAllUsernames());
+        
+        locationList = AdminService.getAllLocations(); 
+        startComboBox.setItems(locationList);
+        endComboBox.setItems(locationList);
+        startComboBox.setEditable(true);
+        endComboBox.setEditable(true);
+        accountIDComboBox1.setEditable(true);
 
-        prefTimeCombobox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-            filterComboBox(prefTimeCombobox, newValue);
-        });
-
-        accountIDs = loadAccountIDs();
+        populateMilitaryTimeList(); // Load all times
     }
 
-    // Load account IDs from WazeAccounts to populate ComboBox
-    public ObservableList<String> loadAccountIDs() {
-        String query = "SELECT account_id, username FROM WazeAccounts";
-
-        try (Connection conn = DatabaseHandler.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-
-            while (rs.next()) {
-                int accountID = rs.getInt("account_id");
-                String username = rs.getString("username");
-                String displayText = accountID + " - " + username;
-                accountIDs.add(displayText);
-            }
-
-            accountIDComboBox1.setItems(accountIDs);
-        } catch (SQLException e) {
-            System.err.println("Error loading account data: " + e.getMessage());
-        }
-                return accountIDs;
-    }
-
-    // Populate time list with every minute from 12:00 AM to 11:59 PM
-    private void populateTimeList() {
-        LocalTime time = LocalTime.MIDNIGHT; // Start at 12:00 AM
-        while (!time.equals(LocalTime.of(23, 59).plusMinutes(1))) { // Until 11:59 PM
-            timeList.add(time.format(timeFormatter)); // Add formatted time
+    private void populateMilitaryTimeList() {
+        LocalTime time = LocalTime.MIDNIGHT;
+        while (!time.equals(LocalTime.of(23, 59).plusMinutes(1))) { // Until 23:59
+            timeList.add(time.format(timeFormatter)); // 24-hour format
             time = time.plusMinutes(1); // Increment by 1 minute
         }
     }
 
-    // Filters the ComboBox based on user input
-    private void filterComboBox(ComboBox<String> comboBox, String userInput) {
-        ObservableList<String> filteredList = FXCollections.observableArrayList();
-        for (String time : timeList) {
-            if (time.toLowerCase().contains(userInput.toLowerCase())) {
-                filteredList.add(time);
-            }
-        }
-        comboBox.setItems(filteredList);
-        comboBox.show(); // Keep dropdown open
-    }
-
-    // Handle adding a new planned drive
     @FXML
     private void handleAddPlannedDrive(ActionEvent event) {
         String accountID = accountIDComboBox1.getValue();
         LocalDate calendar = calendarPicker.getValue();
-        String prefTimeText = prefTimeCombobox.getEditor().getText().trim();
-        String startLoc = startLocTF.getText();
-        String pinnedLoc = pinnedLocTF.getText();
+        String prefTimeText = prefTimeTextField.getText().trim(); // Get text from TextField
+        String startLoc = startComboBox.getValue();
+        String endLoc = endComboBox.getValue();
 
-        // Check for empty fields
-        if (accountID == null || calendar == null || prefTimeText.isEmpty() || pinnedLoc.isEmpty() || startLoc.isEmpty()) {
+        if (accountID == null || calendar == null || prefTimeText.isEmpty() || endLoc.isEmpty() || startLoc.isEmpty()) {
             showAlert("Error", "Please fill in all fields.", Alert.AlertType.ERROR);
             return;
         }
 
-        // Validate and parse time
-        LocalTime plannedTime;
         try {
-            plannedTime = LocalTime.parse(prefTimeText, timeFormatter);
+            @SuppressWarnings("unused")
+            LocalTime enteredTime = LocalTime.parse(prefTimeText, timeFormatter);
         } catch (DateTimeParseException e) {
-            showAlert("Invalid Time", "Please enter a valid time in HH:MM AM/PM format.", Alert.AlertType.WARNING);
+            showAlert("Invalid Time", "Time format should be HH:MM.", Alert.AlertType.WARNING);
             return;
         }
 
-        // Create AdminPlannedDrives object with parsed LocalTime
+        LocalTime plannedTime = LocalTime.parse(prefTimeText, timeFormatter);
+
         AdminPlannedDrives newPlannedDrive = new AdminPlannedDrives(
             Integer.parseInt(accountID.split(" - ")[0]), // Extract numeric account ID
             calendar,
             plannedTime,
             startLoc,
-            pinnedLoc
+            endLoc
         );
 
         boolean success = AdminService.addPlannedDrive(newPlannedDrive);
@@ -129,18 +91,15 @@ public class AddPlannedDrivePopupController {
         }
     }
 
-    // Close the pop-up window
     private void closeWindow() {
         Stage stage = (Stage) savePlannedDriveBTN.getScene().getWindow();
         stage.close();
     }
 
-    // Display success pop-up
     private void showSuccessPopup() {
         showAlert("Success", "Planned drive added successfully!", Alert.AlertType.INFORMATION);
     }
 
-    // Display alerts
     private void showAlert(String title, String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

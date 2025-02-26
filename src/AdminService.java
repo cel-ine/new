@@ -87,4 +87,18 @@ public class AdminService {
     public static boolean updatePlannedDrive(AdminPlannedDrives plannedDrive) {
         return DatabaseHandler.updatePlannedDrive(plannedDrive);
     }
+
+    //
+    public static ObservableList<String> getAllUsernames() {
+        return DatabaseHandler.loadUsernames();
+    }
+
+    public static ObservableList<String> getAllLocations() {
+        return DatabaseHandler.loadLocations();
+    }
+
+    public static ObservableList<String> getAllStopovers() {
+        return DatabaseHandler.loadStopovers();
+    }
 }
+

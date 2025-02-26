@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class AddUserPopupController {
     @FXML private TextField emailField, usernameField, firstNameField, lastNameField;
@@ -40,8 +41,8 @@ public class AddUserPopupController {
             boolean success = AdminService.addUser(newUser);
 
             if (success) {
-                showSuccessPopup(); // Call success pop-up
-                // Update the table in AdminHomepageController
+                showSuccessPopup(); 
+                closeWindow();
                 if (adminHomepageController != null) {
                     adminHomepageController.loadAccountManagerData();
                 }
@@ -68,5 +69,9 @@ public class AddUserPopupController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    private void closeWindow() {
+        Stage stage = (Stage) addUserBTN.getScene().getWindow();
+        stage.close();
     }
 }

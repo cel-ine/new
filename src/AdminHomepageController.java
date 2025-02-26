@@ -1,6 +1,9 @@
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,12 +24,13 @@ import javafx.stage.Stage;
 public class AdminHomepageController {
     // MAIN PANE
     @FXML private StackPane MainPane;
-    @FXML private MenuItem SignOutBTN;
+    @FXML private MenuItem SignOutBTN, accountSettingsBTN;
     @FXML private MenuButton menuBTN;
     @FXML private TableView<AdminUser> dashboardTable;
     @FXML private TableColumn<AdminUser, String> usernameCol, emailCol, lastLogInCol;
     @FXML private Button manageAccBTN, managePlannedDBTN, manageRouteBTN;
     @FXML private Label totalUsersLabel, totalPlannedDrivesLabel, totalRoutesLabel;
+    // @FXML private ImageView dashboardIMG;
     
     // MANAGE ACC PANE
     @FXML private StackPane accountManagerPane;
@@ -39,7 +45,7 @@ public class AdminHomepageController {
     @FXML private Button routesUpdateBTN, routesDeleteBTN, routesAddBTN;
     @FXML private TableView<AdminRoutes> routesManagerTable;
     @FXML private TableColumn<AdminRoutes, Integer> routeAccIDCol;
-    @FXML private TableColumn<AdminRoutes, String> routeIDCol, startPointCol, endPointCol, altRouteCol, stopOverCol, estTimeCol;   ;
+    @FXML private TableColumn<AdminRoutes, String> routeIDCol, startPointCol, endPointCol, altRouteCol, stopOverCol, estTimeCol;   
     @FXML private TextField routeSearchTF;
  
     // MANAGE PLANNED DRIVES PANE
@@ -58,17 +64,21 @@ public class AdminHomepageController {
     private ObservableList<AdminPlannedDrives> plannedDrivesList = FXCollections.observableArrayList(); //PLANNED DRIVES
 
     @FXML
-public void initialize() {
+    public void initialize() {  
+    //  File file = new File("src/res/dashboard_icons.jpg");
+    // Image image = new Image(file.toURI().toString());
+    // dashboardIMG.setImage(image);
+
     showPane(MainPane); 
-    
-    // Initialize Dashboard Table
+
+    // DASHBOARD
     usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
     emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
     lastLogInCol.setCellValueFactory(new PropertyValueFactory<>("lastLogIn"));
     dashboardTable.setItems(userList);
     loadDashboardData();
 
-    // 🟡🟡🟡 Initialize Account Manager Table
+    // 🟡🟡🟡 ACCOUNTS
     accIDCol.setCellValueFactory(new PropertyValueFactory<>("accID"));
     emailCol1.setCellValueFactory(new PropertyValueFactory<>("email"));
     usernameCol1.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -83,27 +93,26 @@ public void initialize() {
     loadAccountManagerData();
     updateCounters();
 
-    // 🟡🟡🟡 Initialize Routes Table
+    // 🟡🟡🟡 ROUTES
     routeIDCol.setCellValueFactory(new PropertyValueFactory<>("routeID"));
-    routeAccIDCol.setCellValueFactory(new PropertyValueFactory<>("accountID"));       
+    routeAccIDCol.setCellValueFactory(new PropertyValueFactory<>("accountID"));  
     startPointCol.setCellValueFactory(new PropertyValueFactory<>("route_startpoint"));
     endPointCol.setCellValueFactory(new PropertyValueFactory<>("route_endpoint"));
     altRouteCol.setCellValueFactory(new PropertyValueFactory<>("alternativeRoute"));
     stopOverCol.setCellValueFactory(new PropertyValueFactory<>("stopOver"));
     estTimeCol.setCellValueFactory(new PropertyValueFactory<>("estTime"));
-
-    // Set ComboBoxTableCell for startPointCol, endPointCol, and stopOverCol
-    ObservableList<String> locationOptions = FXCollections.observableArrayList(AddRoutesPopupController.loadLocations());
+    ObservableList<String> locationOptions = FXCollections.observableArrayList(AdminService.getAllLocations());
+    ObservableList<String> stopOverLocOptions = FXCollections.observableArrayList(AdminService.getAllStopovers());
     startPointCol.setCellFactory(ComboBoxTableCell.forTableColumn(locationOptions));
     endPointCol.setCellFactory(ComboBoxTableCell.forTableColumn(locationOptions));
-    stopOverCol.setCellFactory(ComboBoxTableCell.forTableColumn(locationOptions));
-
+    stopOverCol.setCellFactory(ComboBoxTableCell.forTableColumn(stopOverLocOptions));
     routesManagerTable.setItems(savedRoutesList);
+    TableEditor.makeRoutesTableEditable(startPointCol, endPointCol, stopOverCol);
     routesManagerTable.setEditable(true);
     routeSearchTF.textProperty().addListener((observable, oldValue, newValue) -> filterUsersRoutes(newValue));
     loadRouteManagerData();
-
-    // 🟡🟡🟡 Initialize Planned Drives Table
+     
+    // 🟡🟡🟡 PLANNED DRIVES
     pdIDCol.setCellValueFactory(new PropertyValueFactory<>("plannedDriveID"));
     pdAccIDCol.setCellValueFactory(new PropertyValueFactory<>("account_id"));
     pdCalendarCol.setCellValueFactory(new PropertyValueFactory<>("plannedDate"));
@@ -111,7 +120,7 @@ public void initialize() {
     pdStartLocCol.setCellValueFactory(new PropertyValueFactory<>("startLoc"));
     pdPinnedLocCol.setCellValueFactory(new PropertyValueFactory<>("pinnedLoc"));
     plannedDrivesManagerTable.setItems(plannedDrivesList);
-    TableEditor.makeTableEditable(pdPinnedLocCol); // PLANNED TIME AND DATE SHUD BE EDITABLE ASWELL 
+    TableEditor.makePlannedDrivesTableEditable(pdPinnedLocCol, pdStartLocCol, pdCalendarCol, pdPlannedTimeCol); 
     plannedDrivesManagerTable.setEditable(true);
     searchPlannedDrivesTF.textProperty().addListener((observable, oldValue, newValue) -> filterUsersPlannedDrive(newValue));
 
@@ -119,12 +128,12 @@ public void initialize() {
 }
 
     @FXML
-    private void refreshDashboardTable() { //DASHBOARD TABLE
+    private void refreshDashboardTable() { 
         userList.setAll(AdminService.getAllUsers()); 
         dashboardTable.setItems(userList);
     }
     @FXML
-    private void loadDashboardData() { //DASHBOARD TABLE
+    private void loadDashboardData() { 
         userList.setAll(AdminService.getAllUsers());
         dashboardTable.setItems(userList);
     }
@@ -152,27 +161,44 @@ public void initialize() {
         signInStage.setScene(new Scene(root));
         signInStage.show();
     }
+    @FXML
+    public void handleAccountSettings (ActionEvent event) throws IOException { //SIGN OUT BUTTON 
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("AccountSettings.fxml"));
+            Parent root = loader.load();
+
+            AccountSettingsController accountSettingsController = loader.getController();
+            accountSettingsController.setAdminHomepageController(this); // Set the reference
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     
     // 🎀🎀🎀 ACCOUNT MANAGER
     @FXML
-    private void refreshTableView() {  //REFRESHES ACC TABLE
+    private void refreshTableView() { 
         AccMngrTable.getItems().clear();
         AccMngrTable.getItems().addAll(AdminService.getAllUsers()); 
     } 
     @FXML
-    private void manageAccButtonHandler(ActionEvent event) { // LOADS ACC MANAGER PANE
+    private void manageAccButtonHandler(ActionEvent event) {
         showPane(accountManagerPane);
         loadAccountManagerData();
     }
     @FXML
-    public void loadAccountManagerData() { //ACCOUNT MANAGER TABLE 
+    public void loadAccountManagerData() { 
         accountsList.setAll(AdminService.getAllAccounts());
         AccMngrTable.setItems(accountsList);
     }
     @FXML
-    private void deleteButtonHandler(ActionEvent event) { //ACC MANAGER - DELETE
+    private void deleteButtonHandler(ActionEvent event) { 
         AdminUser selectedUser = AccMngrTable.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
             AdminService.deleteUser(selectedUser.getAccID());
@@ -183,7 +209,7 @@ public void initialize() {
         }
     }
     @FXML
-    private void handleUpdateButton(ActionEvent event) { //ACC MANAGER - UPDATE
+    private void handleUpdateButton(ActionEvent event) { 
         AdminUser selectedUser = AccMngrTable.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
             String newEmail = selectedUser.getEmail();
@@ -196,7 +222,7 @@ public void initialize() {
                     success ? "User details updated successfully!" : "Failed to update user details.",
                     success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
             if (success) {
-                loadAccountManagerData(); // Reload data from the database
+                loadAccountManagerData();
             }
         } else {
             showAlert("Warning", "No user selected for update.", Alert.AlertType.WARNING);
@@ -220,17 +246,23 @@ public void initialize() {
         }
     }
 
+
+    
     // 🎀🎀🎀 ROUTES MANAGER
+    @FXML
+    private void refreshRouteTableView() {
+        routesManagerTable.getItems().clear();
+        routesManagerTable.getItems().addAll(AdminService.getAllRoutes()); 
+    } 
     @FXML
     private void manageRoutesButtonHandler(ActionEvent event) { // LOADS ROUTES MANAGER PANE
         showPane(routesManagerPane);
         loadRouteManagerData();
     }
-    @FXML
-    public void loadRouteManagerData() { //ROUTE MANAGER TABLE 
-        savedRoutesList.setAll(AdminService.getAllRoutes());
-        routesManagerTable.setItems(savedRoutesList);
-    } 
+    public void loadRouteManagerData() {
+        ObservableList<AdminRoutes> updatedList = AdminService.getAllRoutes(); 
+        routesManagerTable.setItems(FXCollections.observableArrayList(updatedList));
+    }
     @FXML
     private void openAddRoutesPopup (ActionEvent event) { //ROUTE MANAGER - ADD
         try {
@@ -239,7 +271,7 @@ public void initialize() {
     
             AddRoutesPopupController addRoutesPopupController = loader.getController();
             addRoutesPopupController.setAdminHomepageController(this);
-            addRoutesPopupController.loadUsernames(); // Load user list
+            AdminService.getAllUsernames(); // Load user list
     
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -259,31 +291,41 @@ public void initialize() {
         }
     }
     @FXML
-    private void handleRouteUpdate(ActionEvent event) { // ROUTE MANAGER - UPDATE
+    private void handleRouteUpdate(ActionEvent event) { 
         AdminRoutes selectedRoute = routesManagerTable.getSelectionModel().getSelectedItem();
-        if (selectedRoute != null) {
-            
-            String newStartPoint = selectedRoute.getRoute_startpoint();
-            String newEndPoint = selectedRoute.getRoute_endpoint();
-            String newStopOver = selectedRoute.getStopOver();
 
-            if (newStartPoint.isEmpty() || newEndPoint.isEmpty() || newStopOver.isEmpty()) {
-                showAlert("Invalid Input", "Start point, end point, and stopover cannot be empty.", Alert.AlertType.WARNING);
-                return;
-            }
+        if (selectedRoute == null) {
+            showAlert("No Selection", "Please select a route to update.", Alert.AlertType.WARNING);
+            return;
+        }
 
-            boolean success = AdminService.updateRoute(selectedRoute);
-            showAlert(success ? "Success" : "Error",
-                    success ? "Route details updated successfully!" : "Failed to update route details.",
-                    success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
-            if (success) {
-                loadRouteManagerData();
-                routesManagerTable.refresh();
-            }
-        } else {
-            showAlert("Warning", "No route selected for update.", Alert.AlertType.WARNING);
+        String newStartPoint = startPointCol.getCellData(selectedRoute); 
+        String newEndPoint = endPointCol.getCellData(selectedRoute); 
+        String newStopOver = stopOverCol.getCellData(selectedRoute); 
+
+        if (newStartPoint == null || newEndPoint == null || newStopOver == null ||
+            newStartPoint.isEmpty() || newEndPoint.isEmpty() || newStopOver.isEmpty()) {
+            showAlert("Invalid Input", "Start point, end point, and stopover cannot be empty.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        selectedRoute.setRoute_startpoint(newStartPoint);
+        selectedRoute.setRoute_endpoint(newEndPoint);
+        selectedRoute.setStopOver(newStopOver);
+
+        System.out.println("Updating route: " + selectedRoute);
+
+        boolean success = AdminService.updateRoute(selectedRoute);
+        showAlert(success ? "Success" : "Error",
+                success ? "Route details updated successfully!" : "Failed to update route details.",
+                success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
+
+        if (success) {
+            loadRouteManagerData(); 
+            routesManagerTable.refresh(); 
         }
     }
+
 
     // 🎀🎀🎀 PLANNED DRIVES
     @FXML
@@ -304,7 +346,7 @@ public void initialize() {
     
             AddPlannedDrivePopupController addPlannedDrivePopupController = loader.getController();
             addPlannedDrivePopupController.setAdminHomepageController(this); // Set the reference
-            addPlannedDrivePopupController.loadAccountIDs(); // Load account IDs
+            AdminService.getAllUsernames(); // Load account IDs
     
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -333,27 +375,52 @@ public void initialize() {
     private void handlePlannedDriveUpdate(ActionEvent event) {
         AdminPlannedDrives selectedDrive = plannedDrivesManagerTable.getSelectionModel().getSelectedItem();
         if (selectedDrive != null) {
-            // Assuming you want to update the pinned location of the planned drive
-            String newPinnedLoc = selectedDrive.getPinnedLoc();
 
-            // Validate the new pinned location if necessary
-            if (newPinnedLoc.isEmpty()) {
-                showAlert("Invalid Input", "Pinned location cannot be empty.", Alert.AlertType.WARNING);
+            LocalDate newDate = pdCalendarCol.getCellData(selectedDrive);
+            String newTimeText = pdPlannedTimeCol.getCellData(selectedDrive) != null
+                                ? pdPlannedTimeCol.getCellData(selectedDrive).toString() : "";
+
+            if (newDate == null) {
+                showAlert("Invalid Date", "Please select a date.", Alert.AlertType.WARNING);
+                return;
+            }
+            if (newDate.isBefore(LocalDate.now())) {
+                showAlert("Invalid Date", "The date cannot be in the past.", Alert.AlertType.WARNING);
                 return;
             }
 
-            // Update the planned drive in the database
+            if (newTimeText.isEmpty()) {
+                showAlert("Invalid Time", "Please enter a time.", Alert.AlertType.WARNING);
+                return;
+            }
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                LocalTime parsedTime = LocalTime.parse(newTimeText, formatter);
+
+                selectedDrive.setPlannedDate(newDate);
+                selectedDrive.setPlannedTime(parsedTime);
+
+            } catch (DateTimeParseException e) {
+                showAlert("Invalid Time Format", "Please use military time in HH:mm format (e.g., 00:00 - 23:59).", Alert.AlertType.WARNING);
+                return;
+            }
+
             boolean success = AdminService.updatePlannedDrive(selectedDrive);
             showAlert(success ? "Success" : "Error",
                     success ? "Planned drive details updated successfully!" : "Failed to update planned drive details.",
                     success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
+
             if (success) {
-                loadPlannedDrivesData(); // Reload data from the database
+                loadPlannedDrivesData();
+                plannedDrivesManagerTable.refresh();
             }
         } else {
             showAlert("Warning", "No planned drive selected for update.", Alert.AlertType.WARNING);
         }
     }
+
+
+
 
     private void filterUsers(String searchText) { // 🔍 SEARCH FUNCTION IN ACC MANAGER
         ObservableList<AdminUser> filteredList = accountsList.filtered(user ->
@@ -365,13 +432,14 @@ public void initialize() {
         AccMngrTable.setItems(filteredList);
     }
 
-    private void filterUsersRoutes(String searchUser) { // 🔍 SEARCH FUNCTION IN ROUTES MANAGER
+    private void filterUsersRoutes(String searchRouteID) {
         ObservableList<AdminRoutes> filteredList = savedRoutesList.filtered(user ->
-            String.valueOf(user.getAccountID()).contains(searchUser)
-        );
-        routesManagerTable.setItems(filteredList);
-    }
-    
+        String.valueOf(user.getAccountID()).contains(searchRouteID)
+
+    );
+    routesManagerTable.setItems(filteredList);
+}
+
     private void filterUsersPlannedDrive (String searchID) { // 🔍 SEARCH FUNCTION IN ROUTES MANAGER
         ObservableList<AdminPlannedDrives> filteredList = plannedDrivesList.filtered(user ->
             String.valueOf(user.getPlannedDriveID()).contains(searchID)
@@ -394,4 +462,6 @@ public void initialize() {
         alert.setContentText(message);
         alert.showAndWait();
     }
+   
 }
+
