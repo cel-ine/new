@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SplashController">
+   <children>
+      <StackPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #14cdff;">
+         <children>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <ImageView fx:id="splashimg" fitHeight="320.0" fitWidth="308.0" layoutX="316.0" layoutY="151.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: fade-in;">
+                     <image>
+                        <Image url="@res/FINALINTRO_ICON.png" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="436.0" layoutY="368.0" prefHeight="77.0" prefWidth="68.0" text="X" />
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+   </children>
+</AnchorPane>
