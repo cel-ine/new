@@ -1,0 +1,52 @@
+.custom-button {
+    -fx-background-color: white !important;
+    -fx-border-color: lightgrey;
+    -fx-text-fill: black;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px 16px;
+    -fx-font-size: 15px;
+    -fx-font-family: "Segoe UI Semibold Italic";
+}
+
+/* Hover Effect - Light Gray */
+.custom-button:hover {
+    -fx-background-color: #f0f0f0 !important;
+}
+
+/* Click Effect - Dark Gray */
+.custom-button:pressed {
+    -fx-background-color:  #0095FF !important;
+    -fx-border-color: grey;
+    -fx-effect: none; /* Remove shadow effect when clicked */
+}
+
+/* ✅ Active (Selected) Button */
+.custom-button.active {
+    -fx-background-color: #0095FF !important; /* Darker gray */
+    -fx-border-color: grey;
+    -fx-text-fill: white !important;
+    -fx-effect: none;
+}
+.circle-container {
+    -fx-background-radius: 100%; /* Tries to round the corners fully */
+    -fx-background-color: white; /* Background if image ratio differs */
+    -fx-padding: 0;
+    -fx-shape: "M100,0 A100,100 0 1,1 100,-0.1 Z"; /* Circle path */
+    -fx-border-radius: 100%;
+    -fx-border-color: gray;
+    -fx-border-width: 2;
+    -fx-overflow: hidden; /* For clipping effect */
+}
+
+.light-button {
+    -fx-background-color: #d3d3d3; /* Light gray */
+    -fx-text-fill: black;
+    -fx-opacity: 0.7; /* Makes it look lighter */
+}
+
+.dark-button {
+    -fx-background-color: #4a4a4a; /* Dark gray */
+    -fx-text-fill: white;
+    -fx-opacity: 1;
+}
