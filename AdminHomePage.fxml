@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="parentAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #14cdff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AdminHomepageController">
+   <children>
+      <StackPane fx:id="MainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #14cdff;" visible="false">
+         <children>
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.2, 0, 0);">
+               <children>
+                  <ImageView fx:id="dashboardIMG" fitHeight="72.0" fitWidth="258.0" layoutX="424.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@res/dashboard%20icons.jpg" />
+                     </image>
+                  </ImageView>
+                  <!-- Header -->
+                  <Label layoutX="397.0" layoutY="70.0" text="Admin Dashboard" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Black" size="35.0" />
+                     </font>
+                  </Label>
+            
+                        <!-- Statistics Cards -->
+                  <HBox alignment="CENTER" layoutX="304.0" layoutY="158.0" spacing="20">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Label fx:id="totalRoutesLabel" text="Total Routes: 0" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold Italic" size="18.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </StackPane>
+                        <StackPane>
+                           <children>
+                              <Label fx:id="totalUsersLabel" text="Total Users: 0" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold Italic" size="18.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </StackPane>
+                        <Label fx:id="totalPlannedDrivesLabel" text="Total Planned Drives: 0" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold Italic" size="18.0" />
+                           </font>
+                        </Label>
+                        <StackPane />
+                     </children>
+                  </HBox>
+            
+                        <!-- User Table -->
+                  <TableView fx:id="dashboardTable" layoutX="262.0" layoutY="210.0" prefHeight="342.0" prefWidth="582.0" style="-fx-background-color: white; -fx-border-radius: 10px; -fx-padding: 0px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 0);">
+                     <columns>
+                        <TableColumn fx:id="usernameCol" prefWidth="182.40003967285156" text="Username" />
+                        <TableColumn fx:id="emailCol" prefWidth="208.79998779296875" text="Email" />
+                        <TableColumn fx:id="lastLogInCol" prefWidth="192.7999267578125" text="Last Logged In" />
+                     </columns>
+                  </TableView>
+            
+                        <!-- Action Buttons -->
+                  <HBox alignment="CENTER" layoutX="132.0" layoutY="439.0" spacing="20" />
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-color: lightgrey; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);;">
+         <children>
+            <Button fx:id="manageAccBTN" layoutX="-1.0" layoutY="310.0" mnemonicParsing="false" onAction="#manageAccButtonHandler" prefHeight="43.0" prefWidth="200.0" style="-fx-background-color: white; -fx-text-fill: black; -fx-border-color: lightgrey;" styleClass="custom-button" text="Manage Account">
+               <font>
+                  <Font name="Segoe UI Semibold Italic" size="15.0" />
+               </font>
+            </Button>
+            <Button fx:id="managePlannedDBTN" layoutY="453.0" mnemonicParsing="false" onAction="#managePlannedDrivesButtonHandler" prefHeight="43.0" prefWidth="200.0" style="-fx-background-color: white; -fx-text-fill: black; -fx-border-color: lightgrey;" styleClass="custom-button" text="Manage Planned Drives">
+               <font>
+                  <Font name="Segoe UI Semibold Italic" size="15.0" />
+               </font>
+            </Button>
+            <Button fx:id="manageRouteBTN" layoutX="-1.0" layoutY="384.0" mnemonicParsing="false" onAction="#manageRoutesButtonHandler" prefHeight="43.0" prefWidth="200.0" style="-fx-background-color: white; -fx-text-fill: black; -fx-border-color: lightgrey;" styleClass="custom-button" text="Manage Routes">
+               <font>
+                  <Font name="Segoe UI Semibold Italic" size="15.0" />
+               </font>
+            </Button>
+            <Button fx:id="back2dashboardBTN" layoutX="1.0" layoutY="239.0" mnemonicParsing="false" onAction="#back2dashboardButtonHandler" prefHeight="43.0" prefWidth="200.0" style="-fx-background-color: white; -fx-text-fill: black; -fx-border-color: lightgrey;" styleClass="custom-button" text="Home">
+               <font>
+                  <Font name="Segoe UI Semibold" size="15.0" />
+               </font>
+            </Button>
+            <Circle fill="WHITE" layoutX="98.0" layoutY="123.0" radius="56.0" stroke="#c4c4c4" strokeType="INSIDE" />
+            <ImageView fx:id="adminHomepageImageView1" fitHeight="112.0" fitWidth="146.0" layoutX="34.0" layoutY="67.0" pickOnBounds="true" preserveRatio="true" style="-fx-blend-mode: MULTIPLY;">
+               <image>
+                  <Image url="@res/PFP/PFP/Untitled%20design.jpg" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="52.0" prefWidth="900.0" style="-fx-background-color: white; -fx-border-color: lightgrey; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.3, 0, 0);">
+         <children>
+            <MenuButton fx:id="menuBTN" layoutX="725.0" layoutY="5.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="159.0" style="-fx-background-color: WHITE;" textAlignment="RIGHT">
+              <items>
+                <MenuItem fx:id="accountSettingsBTN" mnemonicParsing="false" onAction="#handleAccountSettings" text="Account Settings" />
+                <MenuItem fx:id="SignOutBTN" mnemonicParsing="false" onAction="#handleSignOut" text="Sign Out" />
+              </items>
+               <graphic>
+                  <ImageView fx:id="adminHomepageImageView2" fitHeight="37.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@res/PFP/PFP/Untitled%20design.jpg" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <font>
+                  <Font name="Segoe UI Black" size="15.0" />
+               </font>
+            </MenuButton>
+            <ImageView fitHeight="31.0" fitWidth="117.0" layoutX="48.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@res/waze-logo-png_seeklogo-263049-removebg-preview-removebg-preview.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="51.0" fitWidth="45.0" layoutX="3.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@res/WITH%20BG%20WAZE%20ICON.jpg" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <StackPane fx:id="routesManagerPane" layoutX="200.0" layoutY="53.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="547.0" prefWidth="701.0" visible="false">
+         <children>
+            <AnchorPane prefHeight="526.0" prefWidth="682.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);;">
+               <children>
+                  <Label layoutX="32.0" layoutY="21.0" prefHeight="52.0" prefWidth="306.0" text="Routes Manager" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Black" size="35.0" />
+                     </font>
+                  </Label>
+                  <TableView fx:id="routesManagerTable" layoutX="32.0" layoutY="131.0" prefHeight="356.0" prefWidth="638.0">
+                     <columns>
+                        <TableColumn fx:id="routeAccIDCol" prefWidth="73.60005187988281" text="Account ID" />
+                        <TableColumn fx:id="routeIDCol" prefWidth="107.20001220703125" text="Route ID" />
+                        <TableColumn fx:id="startPointCol" prefWidth="84.0" text="Origin" />
+                        <TableColumn fx:id="endPointCol" prefWidth="110.0" text="Destination" />
+                        <TableColumn fx:id="altRouteCol" prefWidth="90.0" text="Alt. Routes" />
+                        <TableColumn fx:id="stopOverCol" prefWidth="100.0" text="Stop Over Location" />
+                        <TableColumn fx:id="estTimeCol" prefWidth="74.39990234375" text="ETA" />
+                     </columns>
+                  </TableView>
+                  <Button fx:id="routesUpdateBTN" layoutX="498.0" layoutY="495.0" mnemonicParsing="false" onAction="#handleRouteUpdate" style="-fx-background-color: #0095FF;" text="Update" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="routesDeleteBTN" layoutX="595.0" layoutY="496.0" mnemonicParsing="false" onAction="#deleteRouteButtonHandler" style="-fx-background-color: #FF5733;" text="Delete" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <TextField fx:id="routeSearchTF" layoutX="89.0" layoutY="90.0" prefHeight="32.0" prefWidth="317.0" promptText="Search by Account ID" />
+                  <Label layoutX="32.0" layoutY="98.0" text="Search:" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold Italic" size="15.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="routesAddBTN" layoutX="531.0" layoutY="90.0" mnemonicParsing="false" onAction="#openAddRoutesPopup" prefHeight="32.0" prefWidth="128.0" style="-fx-background-color: #0095FF;" text="Add Route" textFill="WHITE">
+                     <graphic>
+                        <ImageView fitHeight="22.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@res/ADD%20ICON.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <ImageView fitHeight="73.0" fitWidth="73.0" layoutX="315.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@res/3_-_SAVED_ROUTES-removebg-preview.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+      <StackPane fx:id="accountManagerPane" layoutX="198.0" layoutY="51.0" prefHeight="548.0" prefWidth="700.0" visible="false">
+         <children>
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="547.0" prefWidth="694.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);;">
+               <children>
+                  <Label layoutX="31.0" layoutY="22.0" prefHeight="51.0" prefWidth="306.0" text="Account Manager" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Black" size="35.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="accmngraddUserBTN" layoutX="534.0" layoutY="90.0" mnemonicParsing="false" onAction="#openAddUserPopup" prefHeight="32.0" prefWidth="128.0" style="-fx-background-color: #0095FF;" text="Add User" textFill="WHITE">
+                     <graphic>
+                        <ImageView fitHeight="21.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@res/ADD%20ICON.png" />
+                           </image></ImageView>
+                     </graphic>
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="AccMngrUpdateBTN" layoutX="498.0" layoutY="496.0" mnemonicParsing="false" onAction="#handleUpdateButton" style="-fx-background-color: #0095FF;" text="Update" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="AccMngrDeleteBTN" layoutX="595.0" layoutY="496.0" mnemonicParsing="false" onAction="#deleteButtonHandler" style="-fx-background-color: #FF5733;" text="Delete" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <TextField fx:id="searchTF" layoutX="93.0" layoutY="91.0" prefHeight="32.0" prefWidth="318.0" promptText="Search by Username" />
+                  <Label layoutX="31.0" layoutY="97.0" text="Search:" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold Italic" size="15.0" />
+                     </font>
+                  </Label>
+                  <TableView fx:id="AccMngrTable" editable="true" layoutX="31.0" layoutY="132.0" prefHeight="356.0" prefWidth="638.0">
+                    <columns>
+                      <TableColumn fx:id="accIDCol" prefWidth="76.0" text="Account ID" />
+                      <TableColumn fx:id="emailCol1" prefWidth="123.0" text="E-mail" />
+                        <TableColumn fx:id="usernameCol1" prefWidth="82.0" text="Username" />
+                        <TableColumn fx:id="passwordCol" prefWidth="82.0" text="Password" />
+                        <TableColumn fx:id="birthdateCol" prefWidth="95.0" text="Birthdate" />
+                        <TableColumn fx:id="firstNameCol" prefWidth="85.0" text="First Name" />
+                        <TableColumn fx:id="lastNameCol" prefWidth="93.0" text="Last Name" />
+                    </columns>
+                  </TableView>
+                  <ImageView fitHeight="73.0" fitWidth="100.0" layoutX="337.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@res/5_-_ACCOUNT_MANAGER_LOGO-removebg-preview.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+      <StackPane fx:id="plannedDrivesPane" layoutX="199.0" layoutY="53.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="547.0" prefWidth="701.0">
+         <children>
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="549.0" prefWidth="701.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);;">
+               <children>
+                  <Label layoutX="32.0" layoutY="25.0" text="Planned Drives Manager" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Black" size="35.0" />
+                     </font>
+                  </Label>
+                  <TableView fx:id="plannedDrivesManagerTable" layoutX="32.0" layoutY="132.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="356.0" prefWidth="638.0">
+                     <columns>
+                        <TableColumn fx:id="pdIDCol" prefWidth="99.20002746582031" text="PlannedDrive ID" />
+                        <TableColumn fx:id="pdAccIDCol" prefWidth="77.60003662109375" text="Account ID" />
+                        <TableColumn fx:id="pdCalendarCol" prefWidth="127.20001220703125" text="Drive Date" />
+                        <TableColumn fx:id="pdPlannedTimeCol" prefWidth="107.20001220703125" text="Preferred Time" />
+                        <TableColumn fx:id="pdStartLocCol" prefWidth="116.79998779296875" text="Start Location" />
+                        <TableColumn fx:id="pdPinnedLocCol" prefWidth="115.199951171875" text="End Location" />
+                     </columns>
+                  </TableView>
+                  <Button fx:id="updatePlannedDBTN" layoutX="499.0" layoutY="495.0" mnemonicParsing="false" onAction="#handlePlannedDriveUpdate" prefHeight="29.0" prefWidth="74.0" style="-fx-background-color: #0095FF;" text="Update" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="deletePlannedDBTN" layoutX="598.0" layoutY="495.0" mnemonicParsing="false" onAction="#deletePlannedDriveButtonHandler" prefHeight="29.0" prefWidth="70.0" style="-fx-background-color: #FF5733;" text="Delete" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <TextField fx:id="searchPlannedDrivesTF" layoutX="93.0" layoutY="90.0" prefHeight="32.0" prefWidth="318.0" promptText="Search by Planned Drives ID" />
+                  <Label layoutX="32.0" layoutY="96.0" text="Search:" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold Italic" size="15.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="addPlannedDBTN" layoutX="536.0" layoutY="91.0" mnemonicParsing="false" onAction="#openAddPlannedDrivePopup" prefHeight="30.0" prefWidth="128.0" style="-fx-background-color: #0095FF;" text="Add Plan Drive" textFill="WHITE">
+                     <graphic>
+                        <ImageView fitHeight="22.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@res/ADD%20ICON.jpg" />
+                           </image></ImageView>
+                     </graphic>
+                     <font>
+                        <Font name="Segoe UI Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <ImageView fitHeight="45.0" fitWidth="58.0" layoutX="284.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fitHeight="73.0" fitWidth="74.0" layoutX="454.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@res/4_-_PLANNED_DRIVES-removebg-preview.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>
