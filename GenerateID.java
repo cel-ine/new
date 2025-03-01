@@ -4,9 +4,9 @@ import java.util.Random;
 
 public class GenerateID {
 
-    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/FakeWazeAccount?useSSL=false&serverTimezone=UTC";
+    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/WazeApp?useSSL=false&serverTimezone=Asia/Manila";
     private static final String USER = "root";
-    private static final String PASSWORD = "Example7#24";
+    private static final String PASSWORD = "ilovecompsci";
 
     public static String generateID(String table, String prefix) {
         String id = "";

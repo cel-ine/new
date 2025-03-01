@@ -21,55 +21,52 @@ public class LoginController {
 
     @FXML
     private void LoginButtonHandler(ActionEvent event) throws IOException {
-        String username = SignUpUsernameTF.getText(); //papasa kay homepage
+        String username = SignUpUsernameTF.getText();
         String password = SignUpPwTF.getText();
-
-        int accountId = UserDatabaseHandler.getUserId(username); //used to fetch the acc id nung nag log in
-
+    
         if (username.isEmpty() || password.isEmpty()) {
             showLoginError("Please enter a username and password.");
             return;
         }
-
+    
         if (DatabaseHandler.validateLogin(username, password)) {
             DatabaseHandler.updateLastLogin(username);
-
-            UserService.getInstance().setCurrentUser(
-            UserDatabaseHandler.getUserId(username),
-            username.equalsIgnoreCase("admin") ? "ADMIN" : "USER"
-        );
-
-            String imagePath = adminService.loadProfilePicture(username);
-        if (imagePath == null) {
-            imagePath = ""; 
-        }
-
-        FXMLLoader loader;
-        if (username.equalsIgnoreCase("admin")) {
-            loader = new FXMLLoader(getClass().getResource("AdminHomepage.fxml")); // Admin Homepagev
-
-        } else {
-            loader = new FXMLLoader(getClass().getResource("UserHomepage.fxml")); // User Homepage
-        }
-
+    
+            // ✅ Fetch account ID from database
+            int accountId = UserDatabaseHandler.getUserId(username);
+            String role = username.equalsIgnoreCase("admin") ? "ADMIN" : "USER";
+    
+            // ✅ Store logged-in user in UserService
+            UserService.getInstance().setCurrentUser(accountId, role);
+    
+            // ✅ Load the correct homepage (Admin or User)
+            FXMLLoader loader;
+            if (role.equals("ADMIN")) {
+                loader = new FXMLLoader(getClass().getResource("AdminHomepage.fxml")); // Admin Homepage
+            } else {
+                loader = new FXMLLoader(getClass().getResource("UserHomepage.fxml")); // User Homepage
+            }
+    
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
-
-            if (username.equalsIgnoreCase("admin")) {
+    
+            // ✅ Set user data based on the loaded FXML
+            if (role.equals("ADMIN")) {
                 AdminHomepageController adminController = loader.getController();
-                adminController.setUsername(username, imagePath);
+                adminController.setUsername(username, adminService.loadProfilePicture(username));
                 adminController.setCurrentUser(username);
             } else {
                 UserHomepageController userController = loader.getController();
-                userController.setUserData(accountId, username, imagePath); // PASS THE ACC ID KAY USERHOMEPAGE
+                userController.setUserData(accountId, username, adminService.loadProfilePicture(username));
             }
-            
         } else {
             showLoginError("Invalid username or password.");
         }
     }
+    
+
 
     @FXML
     private void createbuttonhandler(ActionEvent event) throws IOException {

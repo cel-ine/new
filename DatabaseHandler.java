@@ -43,11 +43,16 @@ public class DatabaseHandler {
     }
 
     public static Connection getConnection() {
-        if (connection == null || isConnectionClosed()) {
-            connectToDB();
+        try {
+            if (connection == null || connection.isClosed()) {
+                connectToDB(); // Reconnect if closed
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking connection status: " + e.getMessage());
         }
         return connection;
     }
+    
 
     private static boolean isConnectionClosed() {
         try {
@@ -326,83 +331,81 @@ public class DatabaseHandler {
         }
     }
     
-
+    public static Connection getNewConnection() {
+        try {
+            return DriverManager.getConnection(DB_URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            System.err.println("Failed to create a new connection: " + e.getMessage());
+            return null;
+        }
+    }
+    
 
 
     // 🎀🎀🎀 ROUTES MANAGER- CRUD OPERATIONS
     public static boolean addRoutes(AdminRoutes newRoute, List<String> locationList) {
-        Connection conn = null;
-        PreparedStatement pstmtRoutes = null;
-        PreparedStatement pstmtAltRoutes = null;
-        PreparedStatement pstmtTravelTime = null;
-    
-        String insertRouteQuery = "INSERT INTO WazeRoutes (route_id, account_id, route_startpoint, route_endpoint) VALUES (?, ?, ?, ?)";
-        String insertAltRouteQuery = "INSERT INTO WazeAltRoutes (alt_route_id, route_id, alt_routes, stop_overloc) VALUES (?, ?, ?, ?)";
-        String insertTravelTimeQuery = "INSERT INTO WazeTravelTime (traveltime_id, route_id, est_time) VALUES (?, ?, ?)";
-    
-        try {
-            conn = DatabaseHandler.getConnection();
+        try (Connection conn = DatabaseHandler.getNewConnection()) { // Always get a fresh connection
+            if (conn == null || conn.isClosed()) {
+                System.err.println("Database connection failed!");
+                return false;
+            }
             conn.setAutoCommit(false); // Start transaction
+            System.out.println("Using connection: " + conn);
     
             // Insert into WazeRoutes
-            pstmtRoutes = conn.prepareStatement(insertRouteQuery);
-            pstmtRoutes.setString(1, newRoute.getRouteID()); 
-            pstmtRoutes.setInt(2, newRoute.getAccountID());
-            pstmtRoutes.setString(3, newRoute.getRoute_startpoint());
-            pstmtRoutes.setString(4, newRoute.getRoute_endpoint());
-            pstmtRoutes.executeUpdate();
+            try (PreparedStatement pstmtRoutes = conn.prepareStatement(
+                    "INSERT INTO WazeRoutes (route_id, account_id, route_startpoint, route_endpoint) VALUES (?, ?, ?, ?)")) {
+                pstmtRoutes.setString(1, newRoute.getRouteID());
+                pstmtRoutes.setInt(2, newRoute.getAccountID());
+                pstmtRoutes.setString(3, newRoute.getRoute_startpoint());
+                pstmtRoutes.setString(4, newRoute.getRoute_endpoint());
+                pstmtRoutes.executeUpdate();
+                System.out.println("Route inserted successfully.");
+            }
     
             String altRouteID = RouteIDGenerator.generateAltRouteID();
             String alternativeRoute = RouteIDGenerator.generateRandomAlternativeRoute(
-                newRoute.getRoute_startpoint(),
-                newRoute.getRoute_endpoint(),
-                locationList
-            );
+                    newRoute.getRoute_startpoint(), newRoute.getRoute_endpoint(), locationList);
     
             // Set stopover to "No Stopover" if it's null or empty
             String stopover = (newRoute.getStopOver() == null || newRoute.getStopOver().isEmpty()) 
                             ? "No Stopover" : newRoute.getStopOver();
     
             // Insert into WazeAltRoutes
-            pstmtAltRoutes = conn.prepareStatement(insertAltRouteQuery);
-            pstmtAltRoutes.setString(1, altRouteID);
-            pstmtAltRoutes.setString(2, newRoute.getRouteID());
-            pstmtAltRoutes.setString(3, alternativeRoute); // Can be null or randomly generated
-            pstmtAltRoutes.setString(4, stopover); // Always "No Stopover" if empty
-            pstmtAltRoutes.executeUpdate();
+            try (PreparedStatement pstmtAltRoutes = conn.prepareStatement(
+                    "INSERT INTO WazeAltRoutes (alt_route_id, route_id, alt_routes, stop_overloc) VALUES (?, ?, ?, ?)")) {
+                pstmtAltRoutes.setString(1, altRouteID);
+                pstmtAltRoutes.setString(2, newRoute.getRouteID());
+                pstmtAltRoutes.setString(3, alternativeRoute);
+                pstmtAltRoutes.setString(4, stopover);
+                pstmtAltRoutes.executeUpdate();
+                System.out.println("Alternative route inserted successfully.");
+            }
     
             // Insert into WazeTravelTime
-            pstmtTravelTime = conn.prepareStatement(insertTravelTimeQuery);
-            pstmtTravelTime.setString(1, "T_T-" + String.format("%03d", new Random().nextInt(999))); // Random travel time ID
-            pstmtTravelTime.setString(2, newRoute.getRouteID());
-            pstmtTravelTime.setString(3, RouteIDGenerator.generateRandomEstTime()); // Generate est time
-            pstmtTravelTime.executeUpdate();
+            try (PreparedStatement pstmtTravelTime = conn.prepareStatement(
+                    "INSERT INTO WazeTravelTime (traveltime_id, route_id, est_time) VALUES (?, ?, ?)")) {
+                pstmtTravelTime.setString(1, "T_T-" + String.format("%03d", new Random().nextInt(999)));
+                pstmtTravelTime.setString(2, newRoute.getRouteID());
+                pstmtTravelTime.setString(3, RouteIDGenerator.generateRandomEstTime());
+                pstmtTravelTime.executeUpdate();
+                System.out.println("Travel time inserted successfully.");
+            }
     
             conn.commit(); // Commit transaction
+            System.out.println("Transaction committed successfully.");
             return true;
     
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback changes on failure
-                } catch (SQLException rollbackEx) {
-                    System.err.println("Rollback failed: " + rollbackEx.getMessage());
-                }
-            }
             System.err.println("Error adding route: " + e.getMessage());
             return false;
-    
-        } finally {
-            try {
-                if (pstmtRoutes != null) pstmtRoutes.close();
-                if (pstmtAltRoutes != null) pstmtAltRoutes.close();
-                if (pstmtTravelTime != null) pstmtTravelTime.close();
-                if (conn != null) conn.setAutoCommit(true);
-            } catch (SQLException closeEx) {
-                System.err.println("Error closing resources: " + closeEx.getMessage());
-            }
         }
     }
+    
+    
+    
+    
+    
      
     public static boolean deleteSavedRoute (String routeID) {
         String query = "DELETE FROM WazeRoutes WHERE route_id = ?";
@@ -575,30 +578,4 @@ public class DatabaseHandler {
         return false;
     }
 
-    public void saveProfilePicture(String username, String imagePath) {
-        String query = "UPDATE users SET profile_picture = ? WHERE username = ?";
-        try (Connection conn = DatabaseHandler.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, imagePath);
-            stmt.setString(2, username);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String loadProfilePicture(String username) {
-        String query = "SELECT profile_picture FROM users WHERE username = ?";
-        try (Connection conn = DatabaseHandler.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getString("profile_picture");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

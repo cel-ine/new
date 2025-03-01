@@ -45,14 +45,14 @@
             </ImageView>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="178.0" layoutY="143.0" prefHeight="393.0" prefWidth="550.0" style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0.3, 0, 0); -fx-background-radius: 20px;">
+      <AnchorPane layoutX="178.0" layoutY="143.0" prefHeight="393.0" prefWidth="550.0" style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-radius: 20px;">
          <children>
-            <TextField fx:id="emailField" layoutX="87.0" layoutY="133.0" onAction="#initializeAccountDetails" prefHeight="31.0" prefWidth="181.0" />
-            <TextField fx:id="usernameField" layoutX="86.0" layoutY="203.0" prefHeight="31.0" prefWidth="182.0" />
-            <TextField fx:id="firstNameField" layoutX="302.0" layoutY="133.0" prefHeight="31.0" prefWidth="182.0" />
-            <PasswordField fx:id="passwordField" layoutX="86.0" layoutY="271.0" prefHeight="31.0" prefWidth="182.0" />
-            <TextField fx:id="lastNameField" layoutX="302.0" layoutY="203.0" prefHeight="31.0" prefWidth="182.0" />
-            <DatePicker fx:id="birthdayPicker" layoutX="302.0" layoutY="271.0" prefHeight="31.0" prefWidth="182.0" />
+            <TextField fx:id="emailField" layoutX="87.0" layoutY="133.0" onAction="#initializeAccountDetails" prefHeight="31.0" prefWidth="181.0" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+            <TextField fx:id="usernameField" layoutX="86.0" layoutY="203.0" prefHeight="31.0" prefWidth="182.0" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+            <TextField fx:id="firstNameField" layoutX="302.0" layoutY="133.0" prefHeight="31.0" prefWidth="182.0" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+            <PasswordField fx:id="passwordField" layoutX="86.0" layoutY="271.0" prefHeight="31.0" prefWidth="182.0" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+            <TextField fx:id="lastNameField" layoutX="302.0" layoutY="203.0" prefHeight="31.0" prefWidth="182.0" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+            <DatePicker fx:id="birthdayPicker" layoutX="302.0" layoutY="271.0" prefHeight="31.0" prefWidth="182.0" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
             <StackPane fx:id="imageContainer" layoutX="20.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="94.0" style="-fx-background-color: white;" styleClass="circle-container" stylesheets="@style.css">
                <children>
                   <ImageView fx:id="accountSettingsImageView1" fitHeight="103.0" fitWidth="101.0" pickOnBounds="true" preserveRatio="true" style="-fx-blend-mode: multiply;" styleClass="circle-container">
@@ -62,8 +62,8 @@
                   </ImageView>
                </children>
             </StackPane>
-            <Button layoutX="132.0" layoutY="46.0" mnemonicParsing="false" onAction="#handleImageUpload" prefHeight="26.0" prefWidth="70.0" style="-fx-background-color: white; -fx-border-color: lightgrey;" text="Upload" />
-            <Button fx:id="deleteAccountButton" layoutX="227.0" layoutY="347.0" mnemonicParsing="false" onAction="#handleDeleteAccount" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: #FF5733;" text="Delete Account" textFill="WHITE">
+            <Button layoutX="132.0" layoutY="46.0" mnemonicParsing="false" onAction="#handleImageUpload" prefHeight="26.0" prefWidth="70.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Upload" />
+            <Button fx:id="deleteAccountButton" layoutX="227.0" layoutY="347.0" mnemonicParsing="false" onAction="#handleDeleteAccount" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: #FF5733;" text="Delete Account" textFill="WHITE">
                <font>
                   <Font name="Segoe UI Bold" size="15.0" />
                </font></Button>
@@ -96,15 +96,15 @@
                   <Font name="Segoe UI Bold" size="12.0" />
                </font>
             </Label>
-            <Label layoutX="210.0" layoutY="50.0" text="Min. Size 128 x 128pv (PNG or JPEG/JPG)" />
+            <Label layoutX="210.0" layoutY="50.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Min. Size 128 x 128pv (PNG or JPEG/JPG)" />
          </children>
       </AnchorPane>
-      <Label layoutX="178.0" layoutY="100.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-text-fill: black;" text="My account">
+      <Label layoutX="178.0" layoutY="100.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.0, 2, 2);" text="My account" textFill="WHITE">
          <font>
-            <Font name="Segoe UI Bold" size="30.0" />
+            <Font name="Segoe UI Black" size="30.0" />
          </font>
       </Label>
-      <Button fx:id="saveButton" layoutX="672.0" layoutY="103.0" mnemonicParsing="false" onAction="#handleSaveAccountDetails" style="-fx-background-color: white; -fx-border-color: lightgrey; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" styleClass="light-button" stylesheets="@style.css" text="Save" textFill="LIGHTGRAY">
+      <Button fx:id="saveButton" layoutX="672.0" layoutY="103.0" mnemonicParsing="false" onAction="#handleSaveAccountDetails" style="-fx-background-color: #0095FF; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Save" textFill="WHITE">
          <font>
             <Font name="Segoe UI Bold" size="15.0" />
          </font>

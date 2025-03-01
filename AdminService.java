@@ -58,7 +58,7 @@ public class AdminService {
     }
     public static boolean deleteSavedRoute(String routeID) {
         return DatabaseHandler.deleteSavedRoute(routeID);
-   }
+    }
    public static boolean updateRoute(AdminRoutes route) {
     return DatabaseHandler.updateRoute(route);
     }

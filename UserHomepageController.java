@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -37,6 +38,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -64,15 +66,18 @@ public class UserHomepageController {
     @FXML private DatePicker dateInput;
     @FXML private ComboBox<String> endLoc, inputTime, planEndLoc, planStartLoc, startLoc, stopOverLoc;
     @FXML private TableView<UserPlannedDrives> planneddrivesTable; 
-    // ROUTE TABLE
+    //🔥🔥 ROUTE TABLE
     @FXML private TableView<UserRouteDetails> routeTable;
-    @FXML private TableColumn<UserRouteDetails, String> altRoutesCol, endCol, startCol, stopOverRouteLoc;
+    @FXML private TableColumn<UserRouteDetails, String> altRoutesCol, endCol, startCol, stopOverRouteLoc; 
     @FXML private TableColumn<UserRouteDetails, Time> estTimeCol;
-    //PLANNED DRIVES TABLE
-    @FXML private TableColumn<UserPlannedDrives, String> pinnedLocCol, startLocCol;
+    
+    //🔥🔥PLANNED DRIVES TABLE
+    @FXML private TableColumn<UserPlannedDrives, String> startLocCol, pinnedLocCol;
     @FXML private TableColumn<UserPlannedDrives, Date> planCalendar;
     @FXML private TableColumn<UserPlannedDrives, Time> planTime;
  
+    private ObservableList<String> locationList = FXCollections.observableArrayList(); 
+
     private int accountId;
     private UserAccount currentUser;
 
@@ -90,6 +95,18 @@ public class UserHomepageController {
         showPane(homePane);
         startDateTimeUpdater();
         loadMap();
+          // ✅ Fetch the logged-in user from UserService
+    int accountId = UserService.getInstance().getCurrentUserId();
+    System.out.println("📌 [UserHomepage] Loaded with Account ID: " + accountId);
+
+    // ✅ Prevent resetting to 0
+    if (accountId == 0) {
+        System.err.println("⚠️ ERROR: Account ID is 0! Check login flow.");
+    }
+
+    // ✅ Use accountId to load user-specific data
+        loadPlannedDrives(accountId);
+        loadUserRoutes(accountId);
 
         loadLocations();
 
@@ -103,19 +120,24 @@ public class UserHomepageController {
             }
         });
     
-        // Initialize Route Table
+        // 🟡🟡🟡 ROUTES
         List<UserRouteDetails> editedRoutes = new ArrayList<>();
         startCol.setCellValueFactory(new PropertyValueFactory<>("startPoint"));
         endCol.setCellValueFactory(new PropertyValueFactory<>("endPoint"));
         altRoutesCol.setCellValueFactory(new PropertyValueFactory<>("alternativeRoutes"));
         stopOverRouteLoc.setCellValueFactory(new PropertyValueFactory<>("stopOverLocation"));
         estTimeCol.setCellValueFactory(new PropertyValueFactory<>("estimatedTime"));
+        ObservableList<String> locationOptions = FXCollections.observableArrayList(AdminService.getAllLocations());
+        ObservableList<String> stopOverLocOptions = FXCollections.observableArrayList(AdminService.getAllStopovers());
+        startCol.setCellFactory(ComboBoxTableCell.forTableColumn(locationOptions));
+        endCol.setCellFactory(ComboBoxTableCell.forTableColumn(locationOptions));
+        stopOverRouteLoc.setCellFactory(ComboBoxTableCell.forTableColumn(stopOverLocOptions));
         routeTable.setItems(routeList);
-        UserTableEditor.makeRouteTableEditable(startCol, endCol, altRoutesCol, stopOverRouteLoc, estTimeCol);
+        UserTableEditor.makeRouteTableEditable(startCol, endCol, stopOverRouteLoc); //🌷 removed ung est time and alt routes (dapat random generated un)
         routeTable.setEditable(true);
         loadRoutes();
 
-        // Initialize Planned Drive Table
+        // 🟡🟡🟡 PLANNED DRIVES
         planCalendar.setCellValueFactory(new PropertyValueFactory<>("plannedDate"));
         planTime.setCellValueFactory(new PropertyValueFactory<>("plannedTime"));
         startLocCol.setCellValueFactory(new PropertyValueFactory<>("startLoc"));
@@ -124,8 +146,8 @@ public class UserHomepageController {
         UserTableEditor.makePlannedDrivesTableEditable(startLocCol, pinnedLocCol, planTime, planCalendar);
         planneddrivesTable.setEditable(true);
         loadPlannedDrives();
-
     }
+
     private String loggedInUsername;
     private String imagePath; 
 
@@ -139,6 +161,18 @@ public class UserHomepageController {
             userHomepageImage2.setImage(profileImage);
         }
     }
+    private void loadPlannedDrives(int accountId) {
+        plannedList.setAll(UserService.getUserPlannedDrives(accountId));
+        planneddrivesTable.refresh();
+    }
+
+    private void loadUserRoutes(int accountId) {
+        // Implement the logic to load user routes based on the accountId
+        // For example:
+        routeList.setAll(UserService.getUserRoutes(accountId));
+        routeTable.refresh();
+    }
+
     private void loadMap() {
         WebEngine webEngine = mapWebView.getEngine();
         webEngine.load("https://www.waze.com/live-map/");
@@ -155,7 +189,8 @@ public class UserHomepageController {
         this.accountId = accountId; //SAVES THE USER'S ACC ID 
         this.loggedInUsername = username;
         menuBTN.setText(username); 
-    
+        System.out.println("✅ [DEBUG] Received Account ID in UserHomepage: " + accountId);
+
         if (imagePath != null && !imagePath.isEmpty()) {
             Image newImage = new Image(imagePath);
             userHomepageImage1.setImage(newImage);
@@ -219,7 +254,7 @@ public class UserHomepageController {
 
             String latestImagePath = UserService.loadProfilePicture(loggedInUsername);
 
-            settingsController.setUserData(loggedInUsername, latestImagePath);
+            settingsController.setUserData(accountId, loggedInUsername, latestImagePath);
             settingsController.setUserHomepageController(this); 
 
             Stage stage = (Stage) menuBTN.getScene().getWindow(); 
@@ -230,38 +265,18 @@ public class UserHomepageController {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //CRUD BUTTONS
-
+    // 🎀🎀🎀 ROUTE CRUD
     @FXML
     private void handleAddRouteButtonClick(ActionEvent event) {
         String start = startLoc.getValue();
         String end = endLoc.getValue();
         String selectedStopOverLoc = stopOverLoc.getValue();
 
-        //accountId
-
         if (start == null || end == null) {
             showAlert("Input Error", "Start Location and End Location must be selected.", AlertType.ERROR);
             return;
         }
 
-        // Ensure accountId is set
         if (accountId == 0) {
             showAlert("Error", "User account ID is not set. Please log in again.", AlertType.ERROR);
             return;
@@ -269,61 +284,138 @@ public class UserHomepageController {
 
         System.out.println("Account ID: " + accountId);
 
-        UserRouteDetails newRoute = new UserRouteDetails(accountId, UserService.generateRouteID(), start,
-                end, null, selectedStopOverLoc, null);
+        String alternativeRoute = RouteIDGenerator.generateRandomAlternativeRoute(start, end, locationList);
+        UserRouteDetails newRoute = new UserRouteDetails (accountId, start, end, alternativeRoute, selectedStopOverLoc);
+
+        boolean success = UserService.addUserRoute(accountId, newRoute, locationList);
 
         ObservableList<String> observableLocationList = UserService.getAllLocations(); // Get ObservableList
         List<String> locationList = FXCollections.observableArrayList(observableLocationList); // Convert to List
-        UserDatabaseHandler.addRoutes(newRoute, locationList);
+        UserDatabaseHandler.addRoutes(accountId, newRoute, locationList);
         loadRoutes();
+
+        showSuccessPopup();
     }
-//GET 
-    // @FXML
-    // private void addRouteMethod(ActionEvent event) {
-    // if (startLoc.getValue() == null || endLoc.getValue() == null) {
-    // showAlert("Input Error", "Start Location and End Location must be
-    // selected.");
-    // return;
-    // }
-    // UserRouteDetails newRoute = new UserRouteDetails(accountId,
-    // UserService.generateRouteID(), startLoc.getValue(),
-    // endLoc.getValue(), null, null, null);
+        private void showSuccessPopup() {
+            showAlert("Success", "Route Saved successfully!", Alert.AlertType.INFORMATION);
+    }
 
     @FXML
     private void handleUpdateRouteButtonClick(ActionEvent event) {
-        Set<UserRouteDetails> editedRoutes = UserTableEditor.getEditedRoutes();
-        boolean success = true;
-        for (UserRouteDetails route : editedRoutes) {
-            if (!UserService.updateUserRoute(route)) {
-                success = false;
-            }
+        UserRouteDetails selectedRoute = routeTable.getSelectionModel().getSelectedItem();
+
+        if (selectedRoute == null) {
+            showAlert("No Selection", "Please select a route to update.", Alert.AlertType.WARNING);
+            return;
         }
-        showAlert(success ? "Success" : "Error",
-                success ? "Route details updated successfully!" : "Failed to update route details.",
-                success ? AlertType.INFORMATION : AlertType.ERROR);
-        if (success) {
-            loadRoutes(); // Reload data from the database
-            TableEditor.clearEditedRoutes();
+
+        String newStartPoint = startCol.getCellData(selectedRoute); 
+        String newEndPoint = endCol.getCellData(selectedRoute); 
+        String newStopOver = stopOverRouteLoc.getCellData(selectedRoute); 
+
+        if (newStartPoint == null || newEndPoint == null || newStopOver == null ||
+            newStartPoint.isEmpty() || newEndPoint.isEmpty() || newStopOver.isEmpty()) {
+            showAlert("Invalid Input", "Start point, end point, and stopover cannot be empty.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        boolean startOrEndChanged = !newStartPoint.equals(selectedRoute.getStartPoint()) ||
+                                    !newEndPoint.equals(selectedRoute.getEndPoint());
+
+        selectedRoute.setStartPoint(newStartPoint);
+        selectedRoute.setEndPoint(newEndPoint);
+        selectedRoute.setStopOverLocation(newStopOver);
+
+        if (startOrEndChanged) {
+            // Regenerate estimated time and alternative routes
+            String newEstimatedTime = RouteIDGenerator.generateRandomEstTime();
+            String newAlternativeRoutes = RouteIDGenerator.generateRandomAlternativeRoute(
+                newStartPoint, newEndPoint, getAllLocations()
+            );
+
+            selectedRoute.setEstimatedTime(newEstimatedTime);
+            selectedRoute.setAlternativeRoutes(newAlternativeRoutes);
+        }
+
+    System.out.println("Updating route: " + selectedRoute);
+
+    boolean success = UserService.updateUserRoute(selectedRoute);
+    showAlert(success ? "Success" : "Error",
+            success ? "Route details updated successfully!" : "Failed to update route details.",
+            success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
+
+    if (success) {
+        loadRoutes(); 
+        routeTable.refresh(); 
+    }
+}
+    @FXML
+    private void handleDeleteRouteButtonClick(ActionEvent event) {
+        UserRouteDetails selectedRoute = routeTable.getSelectionModel().getSelectedItem();
+
+        if (selectedRoute != null) {
+            // Show confirmation alert
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Delete Confirmation");
+            alert.setHeaderText(null);
+            alert.setContentText("Are you sure you want to delete the selected route?");
+
+            ButtonType buttonTypeYes = new ButtonType("Yes");
+            ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+            alert.showAndWait().ifPresent(type -> {
+                if (type == buttonTypeYes) {
+                    // User confirmed deletion
+                    UserService.deleteUserRoute(selectedRoute.getRouteId());
+                    loadRoutes();
+                    showRouteDelete();
+                }
+            });
+        } else {
+            showAlert("No Selection", "No route selected. Please select a route to delete.", AlertType.WARNING);
         }
     }
+    private void showRouteDelete() {
+        showAlert("Deleted", "Saved route deleted!", Alert.AlertType.INFORMATION);
+}
 
+
+    // 🎀🎀🎀 PLANNED DRIVE CRUD
     @FXML
     private void handleAddPlannedDriveButtonClick(ActionEvent event) {
         String startLoc = planStartLoc.getValue();
         String endLoc = planEndLoc.getValue();
-        LocalDate planDate = dateInput.getValue();
+        LocalDate planDate = dateInput.getValue(); // Get selected date
 
-        if (startLoc == null || endLoc == null) {
+        if (startLoc == null || endLoc == null || planDate == null) {
             showAlert("Input Error", "All fields must be filled.", AlertType.ERROR);
             return;
         }
 
-        // Properly format time (assuming inputTime is in "HH:mm" format)
+        if (planDate.isBefore(LocalDate.now())) {
+            showAlert("Invalid Date", "You cannot select a past date.", AlertType.WARNING);
+            return;
+        }
+
+        if (accountId == 0) {
+            showAlert("Error", "User account ID is not set. Please log in again.", AlertType.ERROR);
+            return;
+        }
+
         Time inputTimeValue = Time.valueOf(inputTime.getValue() + ":00");
 
-        UserDatabaseHandler.getInstance().insertPlannedDrive(planDate, inputTimeValue, startLoc, endLoc);
+        UserDatabaseHandler.getInstance().insertPlannedDrive(accountId, planDate, inputTimeValue, startLoc, endLoc);
         loadPlannedDrives();
+        showAddSuccess();
     }
+
+    private void showAddSuccess() {
+        showAlert("Success", "Planned drives added successfully!", Alert.AlertType.INFORMATION);
+    }
+
+
 
     @FXML
     private void handleDeletePlannedDriveButtonClick(ActionEvent event) {
@@ -346,59 +438,67 @@ public class UserHomepageController {
                     // User confirmed deletion
                     UserService.deleteUserPlannedDrive(selectedDrive.getPlannedDriveID());
                     loadPlannedDrives();
+                    showDeleteSuccess();
                 }
             });
         } else {
             showAlert("No Selection", "No planned drive selected. Please select a planned drive to delete.",
                     AlertType.WARNING);
-        }
+    }
+}
+        private void showDeleteSuccess() {
+            showAlert("Deleted", "Planned drive deleted.", Alert.AlertType.INFORMATION);
     }
 
     @FXML
-    private void handleDeleteRouteButtonClick(ActionEvent event) {
-        UserRouteDetails selectedRoute = routeTable.getSelectionModel().getSelectedItem();
+    private void handleUpdatePlannedDriveButtonClick(ActionEvent event) {
+        UserPlannedDrives selectedDrive = planneddrivesTable.getSelectionModel().getSelectedItem();
+        
+        if (selectedDrive != null) {
 
-        if (selectedRoute != null) {
-            // Show confirmation alert
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Delete Confirmation");
-            alert.setHeaderText(null);
-            alert.setContentText("Are you sure you want to delete the selected route?");
+            Date newDate = planCalendar.getCellData(selectedDrive);
+            String newTimeText = planTime.getCellData(selectedDrive) != null
+                                ? planTime.getCellData(selectedDrive).toString() : "";
 
-            ButtonType buttonTypeYes = new ButtonType("Yes");
-            ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+            if (newDate == null) {
+                showAlert("Invalid Date", "Please select a date.", Alert.AlertType.WARNING);
+                return;
+            }
+            if (newDate.toLocalDate().isBefore(LocalDate.now())) {
+                showAlert("Invalid Date", "The date cannot be in the past.", Alert.AlertType.WARNING);
+                return;
+            }
 
-            alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+            if (newTimeText.isEmpty()) {
+                showAlert("Invalid Time", "Please enter a time.", Alert.AlertType.WARNING);
+                return;
+            }
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss"); // 24-hour format
+                LocalTime localTime = LocalTime.parse(newTimeText, formatter);
+                Time parsedTime = Time.valueOf(localTime); // Converts LocalTime to SQL Time
+            
+                selectedDrive.setPlannedDate(newDate);
+                selectedDrive.setPlannedTime(parsedTime);
 
-            alert.showAndWait().ifPresent(type -> {
-                if (type == buttonTypeYes) {
-                    // User confirmed deletion
-                    UserService.deleteUserRoute(selectedRoute.getRouteId());
-                    loadRoutes();
-                }
-            });
+            } catch (DateTimeParseException e) {
+                showAlert("Invalid Time Format", "Please use military time in HH:mm format (e.g., 00:00 - 23:59).", Alert.AlertType.WARNING);
+                boolean success = false;
+            }
+
+            boolean success = UserService.updateUserPlannedDrive(selectedDrive);
+            showAlert(success ? "Success" : "Error",
+                    success ? "Planned drive details updated successfully!" : "Failed to update planned drive details.",
+                    success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
+
+            if (success) {
+                loadPlannedDrives();
+                planneddrivesTable.refresh();
+            }
         } else {
-            showAlert("No Selection", "No route selected. Please select a route to delete.", AlertType.WARNING);
+            showAlert("Warning", "No planned drive selected for update.", Alert.AlertType.WARNING);
         }
     }
-
-    // @FXML
-    // private void handleUpdatePlannedDriveButtonClick(ActionEvent event) {
-    //     Set<UserPlannedDrives> editedPlannedDrives = UserTableEditor.getEditedPlannedDrives();
-    //     boolean success = true;
-    //     for (UserPlannedDrives drive : editedPlannedDrives) {
-    //         if (!UserService.updateUserPlannedDrive(drive)) {
-    //             success = false;
-    //         }
-    //     }
-    //     showAlert(success ? "Success" : "Error",
-    //             success ? "Planned drive details updated successfully!" : "Failed to update planned drive details.",
-    //             success ? AlertType.INFORMATION : AlertType.ERROR);
-    //     if (success) {
-    //         loadPlannedDrives(); // Reload data from the database
-    //         UserTableEditor.clearEditedPlannedDrives();
-    //     }
-    // }
 
     private void loadRoutes() {
         routeList.setAll(UserService.getUserRoutes(accountId));
@@ -419,6 +519,10 @@ public class UserHomepageController {
         planStartLoc.setItems(locations);
         planEndLoc.setItems(locations);
         stopOverLoc.setItems(stopoverLocations);
+    }
+
+    private ObservableList<String> getAllLocations() {
+        return FXCollections.observableArrayList(UserService.getAllLocations());
     }
 
     private void loadTimes() {
@@ -459,6 +563,7 @@ public class UserHomepageController {
 
     public void handleSignOut(ActionEvent event) throws IOException {
         Stage stage = (Stage) ((MenuItem) event.getSource()).getParentPopup().getOwnerWindow();
+        UserService.getInstance().logout();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
         Parent root = loader.load();

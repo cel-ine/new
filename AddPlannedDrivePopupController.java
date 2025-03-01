@@ -35,7 +35,14 @@ public class AddPlannedDrivePopupController {
         startComboBox.setEditable(true);
         endComboBox.setEditable(true);
         accountIDComboBox1.setEditable(true);
-
+        calendarPicker.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(date.isBefore(LocalDate.now())); // Disable past dates
+            }
+        });
+        
         populateMilitaryTimeList(); // Load all times
     }
 
@@ -50,18 +57,27 @@ public class AddPlannedDrivePopupController {
     @FXML
     private void handleAddPlannedDrive(ActionEvent event) {
         String accountID = accountIDComboBox1.getValue();
-        LocalDate calendar = calendarPicker.getValue();
-        String prefTimeText = prefTimeTextField.getText().trim(); // Get text from TextField
+        LocalDate calendar = calendarPicker.getValue(); // Get selected date
+        String prefTimeText = prefTimeTextField.getText().trim();
         String startLoc = startComboBox.getValue();
         String endLoc = endComboBox.getValue();
 
-        if (accountID == null || calendar == null || prefTimeText.isEmpty() || endLoc.isEmpty() || startLoc.isEmpty()) {
+        if (accountID == null || calendar == null || prefTimeText.isEmpty() || startLoc == null || endLoc == null) {
             showAlert("Error", "Please fill in all fields.", Alert.AlertType.ERROR);
             return;
         }
 
+        // 🔍 Debugging: Print selected and current date
+        System.out.println("Selected Date: " + calendar);
+        System.out.println("Today's Date: " + LocalDate.now());
+
+        // 🔥 Validation: Ensure the selected date is today or in the future
+        if (calendar.isBefore(LocalDate.now())) {
+            showAlert("Invalid Date", "You cannot select a past date.", Alert.AlertType.WARNING);
+            return;
+        }
+
         try {
-            @SuppressWarnings("unused")
             LocalTime enteredTime = LocalTime.parse(prefTimeText, timeFormatter);
         } catch (DateTimeParseException e) {
             showAlert("Invalid Time", "Time format should be HH:MM.", Alert.AlertType.WARNING);
@@ -71,7 +87,7 @@ public class AddPlannedDrivePopupController {
         LocalTime plannedTime = LocalTime.parse(prefTimeText, timeFormatter);
 
         AdminPlannedDrives newPlannedDrive = new AdminPlannedDrives(
-            Integer.parseInt(accountID.split(" - ")[0]), // Extract numeric account ID
+            Integer.parseInt(accountID.split(" - ")[0]),
             calendar,
             plannedTime,
             startLoc,
@@ -83,7 +99,7 @@ public class AddPlannedDrivePopupController {
         if (success) {
             showSuccessPopup();
             if (adminHomepageController != null) {
-                adminHomepageController.loadPlannedDrivesData(); // Refresh table
+                adminHomepageController.loadPlannedDrivesData();
             }
             closeWindow();
         } else {

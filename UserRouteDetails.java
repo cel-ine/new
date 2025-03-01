@@ -7,10 +7,10 @@ public class UserRouteDetails {
     private String endPoint;
     private String alternativeRoutes;
     private String stopOverLocation;
-    private Time estimatedTime;
+    private String estimatedTime;
 
     public UserRouteDetails(int accountId, String routeId, String startPoint, String endPoint, String alternativeRoutes,
-            String stopOverLocation, Time estimatedTime) {
+            String stopOverLocation, String estimatedTime) {
         this.accountId = accountId;
         this.routeId = routeId;
         this.startPoint = startPoint;
@@ -20,7 +20,7 @@ public class UserRouteDetails {
         this.estimatedTime = estimatedTime;
     }
     public UserRouteDetails(String startPoint, String endPoint, String alternativeRoutes,
-    String stopOverLocation, Time estimatedTime) {
+    String stopOverLocation, String estimatedTime) {
     // this.accountId = accountId;
     // this.routeId = routeId;
     this.startPoint = startPoint;
@@ -29,6 +29,16 @@ public class UserRouteDetails {
     this.stopOverLocation = stopOverLocation;
     this.estimatedTime = estimatedTime;
     }
+    //🌷
+    public UserRouteDetails(int accountId, String startPoint, String endPoint, String alternativeRoutes, String stopOverLocation) {
+        this.accountId = accountId;
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+        this.alternativeRoutes = alternativeRoutes;
+        this.stopOverLocation = stopOverLocation;
+        this.routeId = RouteIDGenerator.generateRouteID(startPoint, endPoint);
+}
+   
 
     // Getters and setters for each field
     public int getAccountId() {
@@ -79,11 +89,11 @@ public class UserRouteDetails {
         this.stopOverLocation = stopOverLocation;
     }
 
-    public Time getEstimatedTime() {
+    public String getEstimatedTime() {
         return estimatedTime;
     }
 
-    public void setEstimatedTime(Time estimatedTime) {
+    public void setEstimatedTime(String estimatedTime) {
         this.estimatedTime = estimatedTime;
     }
 }

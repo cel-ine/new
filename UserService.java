@@ -7,76 +7,84 @@ import javafx.collections.ObservableList;
 
 public class UserService {
     private static UserService instance;
-    private int currentUserId;
-    private String currentUserRole;
+    private int currentUserId = 0;  // Default to 0 (no user logged in)
+    private String currentUserRole = null;
     
-    // Private constructor to prevent direct instantiation
-    UserService() {}
-    
-    // Thread-safe singleton implementation
+    // Private constructor for Singleton
+    private UserService() {}
+
+    // Thread-safe Singleton
     public static synchronized UserService getInstance() {
         if (instance == null) {
             instance = new UserService();
         }
         return instance;
     }
-    
-    // User Management
+
     public void setCurrentUser(int userId, String role) {
         this.currentUserId = userId;
         this.currentUserRole = role;
+        System.out.println("✅ [UserService] User set: ID=" + userId + ", Role=" + role);
     }
     
     public int getCurrentUserId() {
+        System.out.println("🔍 [UserService] Fetching Account ID: " + currentUserId);
         return currentUserId;
     }
     
+
+    // ✅ Get current user role
     public String getCurrentUserRole() {
         return currentUserRole;
     }
-    
+
+    // ✅ Check if user is logged in
     public boolean isLoggedIn() {
-        return currentUserId != 0;
+        return currentUserId > 0;
     }
-    
+
+    // ✅ Logout user
     public void logout() {
-        currentUserId = (Integer) null;
+        currentUserId = 0;  // Reset to 0 instead of null
         currentUserRole = null;
+        System.out.println("🚪 [UserService] User logged out.");
     }
-    
+
+
     // Route Management
     public static ObservableList<UserRouteDetails> getUserRoutes(int accountId) {
         return UserDatabaseHandler.getInstance().getUserRouteDetails(accountId);
     }
-    
-    public static boolean addUserRoute(UserRouteDetails newRoute, List<String> locationList) {
-        return UserDatabaseHandler.getInstance().addRoutes(newRoute, locationList);
+    public static boolean addUserRoute(int accountId, UserRouteDetails newRoute, List<String> locationList) {
+        UserDatabaseHandler.getInstance();
+        return UserDatabaseHandler.addRoutes(accountId,newRoute, locationList);
     }
-    
     public static boolean deleteUserRoute(String routeID) {
         return UserDatabaseHandler.getInstance().deleteUserRoute(routeID);
     }
-    
     public static boolean updateUserRoute(UserRouteDetails route) {
         return UserDatabaseHandler.getInstance().updateUserRoute(route);
     }
-    
+
+
     // Planned Drives Management
     public static ObservableList<UserPlannedDrives> getUserPlannedDrives(int accountId) {
         return UserDatabaseHandler.getInstance().getPlannedDrives(accountId);
     }
-    
-    public static boolean addUserPlannedDrive(UserPlannedDrives newPlannedDrive) {
-        return UserDatabaseHandler.getInstance().addUserPlannedDrive(newPlannedDrive);
+    public static boolean addUserPlannedDrive(int accountId, UserPlannedDrives newPlannedDrive, String plannedDriveID) {
+        UserDatabaseHandler.getInstance();
+        return UserDatabaseHandler.addUserPlannedDrive(accountId ,newPlannedDrive, plannedDriveID);
     }
-    
     public static boolean deleteUserPlannedDrive(int driveID) {
-        return UserDatabaseHandler.getInstance().deleteUserPlannedDrive(driveID);
+        UserDatabaseHandler.getInstance();
+        return UserDatabaseHandler.deleteUserPlannedDrive(driveID);
+    }
+
+    public static boolean updateUserPlannedDrive(UserPlannedDrives plannedDrive) {
+        UserDatabaseHandler.getInstance();
+        return UserDatabaseHandler.updateUserPlannedDrive(plannedDrive);
     }
     
-    public static boolean updateUserPlannedDrive(UserPlannedDrives plannedDrive) {
-        return UserDatabaseHandler.getInstance().updateUserPlannedDrive(plannedDrive);
-    }
     
     // ID Generation
     public static String generateRouteID() {

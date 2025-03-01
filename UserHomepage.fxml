@@ -53,11 +53,11 @@
    <children>
     <AnchorPane fx:id="foundationPane2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #14cdff;">
       <children>
-            <StackPane fx:id="routestckPane" layoutX="200.0" layoutY="54.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="542.0" prefWidth="704.0">
+            <StackPane fx:id="routestckPane" layoutX="200.0" layoutY="54.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="542.0" prefWidth="704.0" visible="false">
                <children>
                   <AnchorPane fx:id="routeanchPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="698.0" style="-fx-background-color: #14cdff; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);">
                      <children>
-                        <TableView fx:id="routeTable" layoutX="36.0" layoutY="187.0" prefHeight="294.0" prefWidth="634.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);">
+                        <TableView fx:id="routeTable" layoutX="36.0" layoutY="187.0" prefHeight="294.0" prefWidth="634.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
                           <columns>
                             <TableColumn fx:id="startCol" prefWidth="118.40003967285156" text="Origin" />
                               <TableColumn fx:id="endCol" prefWidth="124.0" text="Destination" />
@@ -66,49 +66,53 @@
                               <TableColumn fx:id="estTimeCol" minWidth="0.0" prefWidth="100.0" text="ETA" />
                           </columns>
                         </TableView>
-                        <Label fx:id="routeLabel" layoutX="27.0" layoutY="22.0" prefHeight="58.0" prefWidth="236.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Saved Routes" textFill="WHITE">
+                        <Label fx:id="routeLabel" layoutX="27.0" layoutY="22.0" prefHeight="58.0" prefWidth="236.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.0, 2, 2);" text="Saved Routes" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Black" size="35.0" />
                            </font>
                         </Label>
-                        <Button fx:id="deleteBTN" layoutX="585.0" layoutY="495.0" mnemonicParsing="false" onAction="#handleDeleteRouteButtonClick" prefHeight="32.0" prefWidth="81.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: #FF5733;" text="Delete " textFill="WHITE">
+                        <Button fx:id="deleteBTN" layoutX="585.0" layoutY="495.0" mnemonicParsing="false" onAction="#handleDeleteRouteButtonClick" prefHeight="29.0" prefWidth="83.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: #FF5733; -fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Delete " textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold" size="15.0" />
                            </font>
                         </Button>
-                        <Button fx:id="addRoute" layoutX="389.0" layoutY="495.0" mnemonicParsing="false" onAction="#handleAddRouteButtonClick" prefHeight="32.0" prefWidth="183.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: #0095FF;" text="Add to Saved Routes" textFill="WHITE">
+                        <Button fx:id="addRoute" layoutX="36.0" layoutY="496.0" mnemonicParsing="false" onAction="#handleAddRouteButtonClick" prefHeight="29.0" prefWidth="175.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: #0095FF;" text="Add to Saved Routes" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold" size="15.0" />
                            </font>
                         </Button>
-                        <ComboBox fx:id="startLoc" layoutX="222.0" layoutY="86.0" prefHeight="27.0" prefWidth="175.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: white; -fx-border-color: lightgrey;" />
-                        <ComboBox fx:id="endLoc" layoutX="220.0" layoutY="137.0" prefHeight="27.0" prefWidth="178.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: white; -fx-border-color: lightgrey;" />
-                        <ComboBox fx:id="stopOverLoc" editable="true" layoutX="431.0" layoutY="137.0" prefHeight="27.0" prefWidth="194.0" promptText="Choose Stop Over Location" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: white; -fx-border-color: lightgrey;" />
-                        <ImageView fx:id="startPic" fitHeight="43.0" fitWidth="52.0" layoutX="34.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);">
+                        <ComboBox fx:id="startLoc" layoutX="222.0" layoutY="86.0" prefHeight="27.0" prefWidth="175.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: white; -fx-border-color: lightgrey;" />
+                        <ComboBox fx:id="endLoc" layoutX="220.0" layoutY="137.0" prefHeight="27.0" prefWidth="178.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: white; -fx-border-color: lightgrey;" />
+                        <ComboBox fx:id="stopOverLoc" editable="true" layoutX="442.0" layoutY="137.0" prefHeight="27.0" prefWidth="194.0" promptText="Choose Stop Over Location" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: white; -fx-border-color: lightgrey;" />
+                        <ImageView fx:id="startPic" fitHeight="43.0" fitWidth="52.0" layoutX="34.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
                            <image>
                               <Image url="@res/startpoint.png" />
                            </image>
                         </ImageView>
-                        <ImageView fx:id="endPic" fitHeight="43.0" fitWidth="32.0" layoutX="40.0" layoutY="135.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);">
+                        <ImageView fx:id="endPic" fitHeight="43.0" fitWidth="32.0" layoutX="40.0" layoutY="135.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
                            <image>
                               <Image url="@res/endpoint.png" />
                            </image>
                         </ImageView>
-                        <Label fx:id="usernameLabel1" layoutX="72.0" layoutY="91.0" prefHeight="20.0" prefWidth="145.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Select Start Location:" textFill="WHITE">
+                        <Label fx:id="usernameLabel1" layoutX="72.0" layoutY="91.0" prefHeight="20.0" prefWidth="145.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Select Start Location:" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold Italic" size="14.0" />
                            </font>
                         </Label>
-                        <Label fx:id="usernameLabel11" layoutX="72.0" layoutY="141.0" prefHeight="20.0" prefWidth="136.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Select End Location:" textFill="WHITE">
+                        <Label fx:id="usernameLabel11" layoutX="72.0" layoutY="141.0" prefHeight="20.0" prefWidth="136.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Select End Location:" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold Italic" size="14.0" />
                            </font>
                         </Label>
+                        <Button layoutX="484.0" layoutY="494.0" mnemonicParsing="false" onAction="#handleUpdateRouteButtonClick" prefHeight="29.0" prefWidth="83.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: #0095FF;" text="Update" textFill="WHITE">
+                           <font>
+                              <Font name="Segoe UI Bold" size="15.0" />
+                           </font></Button>
                      </children>
                   </AnchorPane>
                </children>
             </StackPane>
-            <StackPane fx:id="homePane" layoutX="197.0" layoutY="49.0" prefHeight="550.0" prefWidth="704.0" style="-fx-background-color: #14cdff;" visible="false">
+            <StackPane fx:id="homePane" layoutX="197.0" layoutY="49.0" prefHeight="550.0" prefWidth="704.0" style="-fx-background-color: #14cdff;">
                <children>
                   <AnchorPane fx:id="homeanchrPane" prefHeight="550.0" prefWidth="671.0">
                      <children>
@@ -145,7 +149,7 @@
                               <Font name="Segoe UI Black" size="40.0" />
                            </font>
                         </Label>
-                        <WebView fx:id="mapWebView" layoutX="31.0" layoutY="16.0" prefHeight="512.0" prefWidth="646.0" />
+                        <WebView fx:id="mapWebView" layoutX="3.0" layoutY="1.0" prefHeight="550.0" prefWidth="704.0" />
                      </children>
                   </AnchorPane>
                </children>
@@ -154,72 +158,76 @@
                <children>
                   <AnchorPane fx:id="planneddrivesanchPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="554.0" prefWidth="698.0">
                      <children>
-                        <Label fx:id="drivesLabel" layoutX="34.0" layoutY="28.0" prefHeight="58.0" prefWidth="274.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Planned Drives" textFill="WHITE">
+                        <Label fx:id="drivesLabel" layoutX="34.0" layoutY="28.0" prefHeight="58.0" prefWidth="274.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.0, 2, 2);" text="Planned Drives" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Black" size="35.0" />
                            </font>
                         </Label>
-                        <TableView fx:id="planneddrivesTable" layoutX="34.0" layoutY="192.0" prefHeight="294.0" prefWidth="634.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);">
+                        <TableView fx:id="planneddrivesTable" layoutX="28.0" layoutY="188.0" prefHeight="288.0" prefWidth="646.0" style="-fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0.0, 1, 1);">
                            <columns>
-                              <TableColumn fx:id="planCalendar" prefWidth="117.99996948242188" text="Calendar" />
-                              <TableColumn fx:id="planTime" prefWidth="155.33328247070312" text="Planned Time" />
-                              <TableColumn fx:id="startLocCol" prefWidth="201.9998779296875" text="Start Location" />
-                              <TableColumn fx:id="pinnedLocCol" prefWidth="156.80002441406248" text="End Location" />
+                              <TableColumn fx:id="planCalendar" minWidth="0.0" prefWidth="143.99995803833008" text="Calendar" />
+                              <TableColumn fx:id="planTime" prefWidth="144.80003356933594" text="Planned Time" />
+                              <TableColumn fx:id="startLocCol" prefWidth="180.800048828125" text="Start Location" />
+                              <TableColumn fx:id="pinnedLocCol" prefWidth="176.7999267578125" text="End Location" />
                            </columns>
                         </TableView>
-                        <Button fx:id="deleteBTN" layoutX="504.0" layoutY="504.0" mnemonicParsing="false" onAction="#handleDeletePlannedDriveButtonClick" prefHeight="29.0" prefWidth="164.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: #FF5733;" text="Delete Planned Drive" textFill="WHITE">
+                        <Button fx:id="deleteBTN" layoutX="510.0" layoutY="502.0" mnemonicParsing="false" onAction="#handleDeletePlannedDriveButtonClick" prefHeight="4.0" prefWidth="164.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: #FF5733;" text="Delete Planned Drive" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold" size="15.0" />
                            </font>
                         </Button>
-                        <Button fx:id="addBTN" layoutX="372.0" layoutY="501.0" mnemonicParsing="false" onAction="#handleAddPlannedDriveButtonClick" prefHeight="32.0" prefWidth="112.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: #0095FF;" text="Plan drive" textFill="WHITE">
+                        <Button fx:id="addBTN" layoutX="28.0" layoutY="502.0" mnemonicParsing="false" onAction="#handleAddPlannedDriveButtonClick" prefHeight="13.0" prefWidth="112.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: #0095FF; -fx-border-radius: 0.5;" text="Plan drive" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold" size="15.0" />
                            </font></Button>
-                        <DatePicker fx:id="dateInput" layoutX="157.0" layoutY="91.0" prefWidth="175.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: white; -fx-border-color: lightgrey;" />
-                        <Label fx:id="selectDateLabel" layoutX="66.0" layoutY="95.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Select Date:" textFill="WHITE">
+                        <DatePicker fx:id="dateInput" layoutX="171.0" layoutY="91.0" prefHeight="13.0" prefWidth="146.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: white; -fx-border-color: lightgrey;" />
+                        <Label fx:id="selectDateLabel" layoutX="75.0" layoutY="95.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Select Date:" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold Italic" size="15.0" />
                            </font>
                         </Label>
-                        <Label fx:id="timeLabel" layoutX="68.0" layoutY="146.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Input Time:" textFill="WHITE">
+                        <Label fx:id="timeLabel" layoutX="84.0" layoutY="146.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Input Time:" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold Italic" size="15.0" />
                            </font>
                         </Label>
-                        <ComboBox fx:id="inputTime" layoutX="156.0" layoutY="142.0" prefHeight="27.0" prefWidth="177.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: white; -fx-border-color: lightgrey;" />
-                        <Label fx:id="startLabel" layoutX="376.0" layoutY="95.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="Start Location:" textFill="WHITE">
+                        <ComboBox fx:id="inputTime" layoutX="171.0" layoutY="143.0" prefHeight="27.0" prefWidth="146.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: white;" />
+                        <Label fx:id="startLabel" layoutX="363.0" layoutY="95.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Start Location:" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold Italic" size="15.0" />
                            </font>
                         </Label>
-                        <Label fx:id="endLabel" layoutX="380.0" layoutY="147.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2);" text="End Location:" textFill="WHITE">
+                        <Label fx:id="endLabel" layoutX="363.0" layoutY="146.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="End Location:" textFill="WHITE">
                            <font>
                               <Font name="Segoe UI Bold Italic" size="15.0" />
                            </font>
                         </Label>
-                        <ComboBox fx:id="planStartLoc" layoutX="490.0" layoutY="91.0" prefHeight="27.0" prefWidth="177.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: white; -fx-border-color: lightgrey;" />
-                        <ComboBox fx:id="planEndLoc" layoutX="490.0" layoutY="142.0" prefHeight="27.0" prefWidth="177.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.3, 0, 2); -fx-background-color: white; -fx-border-color: lightgrey;" />
-                        <ImageView fitHeight="27.0" fitWidth="32.0" layoutX="34.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true">
+                        <ComboBox fx:id="planStartLoc" layoutX="474.0" layoutY="91.0" prefHeight="27.0" prefWidth="146.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: white; -fx-border-color: lightgrey;" />
+                        <ComboBox fx:id="planEndLoc" layoutX="474.0" layoutY="142.0" prefHeight="27.0" prefWidth="146.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: white; -fx-border-color: lightgrey;" />
+                        <ImageView fitHeight="27.0" fitWidth="32.0" layoutX="48.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
                            <image>
                               <Image url="@res/1_-_SELECT_DATE_ICON-removebg-preview.png" />
                            </image>
                         </ImageView>
-                        <ImageView fitHeight="27.0" fitWidth="32.0" layoutX="34.0" layoutY="143.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="27.0" fitWidth="32.0" layoutX="48.0" layoutY="143.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
                            <image>
                               <Image url="@res/2_-_TIME_ICON-removebg-preview.png" />
                            </image>
                         </ImageView>
-                        <ImageView fitHeight="52.0" fitWidth="54.0" layoutX="334.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="52.0" fitWidth="54.0" layoutX="323.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
                            <image>
                               <Image url="@res/startpoint.png" />
                            </image>
                         </ImageView>
-                        <ImageView fitHeight="32.0" fitWidth="45.0" layoutX="344.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="32.0" fitWidth="45.0" layoutX="335.0" layoutY="141.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
                            <image>
                               <Image url="@res/endpoint.png" />
                            </image>
                         </ImageView>
+                        <Button layoutX="406.0" layoutY="502.0" mnemonicParsing="false" onAction="#handleUpdatePlannedDriveButtonClick" prefHeight="32.0" prefWidth="83.0" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3); -fx-background-color: #0095FF; -fx-border-radius: 0.5;" text="Update" textFill="WHITE">
+                           <font>
+                              <Font name="Segoe UI Bold" size="15.0" />
+                           </font></Button>
                      </children>
                   </AnchorPane>
                </children>
@@ -228,15 +236,15 @@
                <children>
                   <Button fx:id="homeButton" layoutY="256.0" mnemonicParsing="false" onAction="#handleHomeButtonClick" prefHeight="43.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-color: lightgrey;" styleClass="custom-button" text="Home">
                      <font>
-                        <Font name="Segoe UI Semibold Italic" size="15.0" />
+                        <Font name="Segoe UI Bold" size="15.0" />
                      </font></Button>
                   <Button fx:id="routeButton" layoutY="331.0" mnemonicParsing="false" onAction="#handleRouteButtonClick" prefHeight="43.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-color: lightgrey;" styleClass="custom-button" text="Saved Routes">
                      <font>
-                        <Font name="Segoe UI Semibold Italic" size="15.0" />
+                        <Font name="Segoe UI Bold" size="15.0" />
                      </font></Button>
                   <Button fx:id="planneddrivesButton" layoutY="403.0" mnemonicParsing="false" onAction="#handlePlannedDrivesButtonClick" prefHeight="43.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-color: lightgrey;" styleClass="custom-button" text="Planned Drives ">
                      <font>
-                        <Font name="Segoe UI Semibold Italic" size="15.0" />
+                        <Font name="Segoe UI Bold" size="15.0" />
                      </font></Button>
                </children>
             </AnchorPane>
@@ -270,7 +278,7 @@
                   </ImageView>
                </children>
             </AnchorPane>
-            <Circle fill="WHITE" layoutX="101.0" layoutY="134.0" radius="56.0" stroke="#c4c4c4" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="101.0" layoutY="134.0" radius="56.0" stroke="#c4c4c4" strokeType="INSIDE" style="-fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" />
             <ImageView fx:id="userHomepageImage1" fitHeight="112.0" fitWidth="128.0" layoutX="37.0" layoutY="78.0" pickOnBounds="true" preserveRatio="true" style="-fx-blend-mode: MULTIPLY;">
                <image>
                   <Image url="@res/PFP/PFP/Untitled%20design.jpg" />

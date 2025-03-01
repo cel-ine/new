@@ -141,94 +141,99 @@ public class UserDatabaseHandler {
     }
 
     // 💗💗💗 NEW PLANNED DRIVE
-    public boolean insertPlannedDrive(LocalDate date, Time inputTime, String startLoc, String endLoc) {
+    public boolean insertPlannedDrive(int accountId, LocalDate date, Time inputTime, String startLoc, String endLoc) {
         UserDatabaseHandler handler = UserDatabaseHandler.getInstance(); // Ensure connection is initialized
         Connection connection = handler.getConnection(); // Get the active connection
-
+    
         if (connection == null || handler.isConnectionClosed()) {
             System.out.println("⚠ Failed to insert planned drive: No database connection.");
             return false;
         }
-
-        int plannedDriveID = 1;
-        int accountId = 1; // Assume account ID is 1 for now
-
-        String insertQuery = "INSERT INTO WazePlannedDrives ( planned_date, planned_time, start_loc, pinned_loc) VALUES ( ?, ?, ?, ?)";
-
+    
+        String insertQuery = "INSERT INTO WazePlannedDrives (account_id, planned_date, planned_time, start_loc, pinned_loc) VALUES (?, ?, ?, ?, ?)";
+    
         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
-
-            insertStmt.setDate(1, java.sql.Date.valueOf(date.plusDays(1))); // java.sql.Date
-            insertStmt.setTime(2, inputTime);
-            insertStmt.setString(3, startLoc);
-            insertStmt.setString(4, endLoc);
+            insertStmt.setInt(1, accountId); // ✅ Assign the correct account ID
+            insertStmt.setDate(2, java.sql.Date.valueOf(date.plusDays(1))); // ✅ planned_date
+            insertStmt.setTime(3, inputTime); // ✅ planned_time
+            insertStmt.setString(4, startLoc); // ✅ start_loc
+            insertStmt.setString(5, endLoc); // ✅ pinned_loc
+    
             insertStmt.executeUpdate();
-
-            getPlannedDrives(accountId); // Refresh the list of planned drives
-            System.out.println("✅ Planned drive created successfully: " + plannedDriveID);
+    
+            getPlannedDrives(accountId); // ✅ Refresh the list of planned drives for this user
+            System.out.println("✅ Planned drive created successfully for Account ID: " + accountId);
             return true;
-
+    
         } catch (SQLException e) {
             System.err.println("❌ Error adding planned drive: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
+    
 
     //💗💗💗 ROUTES TABLE DISPLAY
-    public ObservableList<UserRouteDetails> getUserRouteDetails(int accountId) {
-        ObservableList<UserRouteDetails> routes = FXCollections.observableArrayList();
-        UserDatabaseHandler handler = UserDatabaseHandler.getInstance();
-        Connection connection = UserDatabaseHandler.getConnection();
+    //💗💗💗 ROUTES TABLE DISPLAY
+public ObservableList<UserRouteDetails> getUserRouteDetails(int accountId) {
+    ObservableList<UserRouteDetails> routes = FXCollections.observableArrayList();
+    UserDatabaseHandler handler = UserDatabaseHandler.getInstance();
+    Connection connection = UserDatabaseHandler.getConnection();
 
-        if (connection == null || UserDatabaseHandler.isConnectionClosed()) {
-            System.out.println("⚠ Failed to fetch routes: No database connection.");
-            return routes; // Return empty list if no connection
-        }
+    if (connection == null || UserDatabaseHandler.isConnectionClosed()) {
+        System.out.println("⚠ Failed to fetch routes: No database connection.");
+        return routes; // Return empty list if no connection
+    }
 
-        String query = """
-            SELECT 
-
-        wr.route_startpoint,
-        wr.route_endpoint,
-        wat.alt_routes,
-        wat.stop_overloc,
-        wtt.est_time
+    String query = """
+        SELECT 
+            wr.route_id,
+            wr.account_id,
+            wr.route_startpoint,
+            wr.route_endpoint,
+            wat.alt_routes,
+            wat.stop_overloc,
+            wtt.est_time
         FROM WazeRoutes wr
         LEFT JOIN WazeAltRoutes wat ON wr.route_id = wat.route_id
-        LEFT JOIN WazeTravelTime wtt ON wr.route_id = wtt.route_id;
-            """; 
+        LEFT JOIN WazeTravelTime wtt ON wr.route_id = wtt.route_id
+        WHERE wr.account_id = ?;
+    """; 
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                routes.add(new UserRouteDetails(
-                        // rs.getInt("accountId"),
-                        // rs.getString("routeId"),
-                        rs.getString("route_startpoint"),
-                        rs.getString("route_endpoint"),
-                        rs.getString("alt_routes"),
-                        rs.getString("stop_overloc"),
-                        rs.getTime("est_time")));
-            }
-            System.out.println("✅ Fetched " + routes.size() + " routes for account ID: " + accountId);
-        } catch (SQLException e) {
-            System.err.println("❌ Error fetching routes: " + e.getMessage());
-            e.printStackTrace();
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, accountId); //passing the account id sa query 
+
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            routes.add(new UserRouteDetails(
+                rs.getInt("account_id"),
+                rs.getString("route_id"),
+                rs.getString("route_startpoint"),
+                rs.getString("route_endpoint"),
+                rs.getString("alt_routes"),
+                rs.getString("stop_overloc"),
+                rs.getString("est_time")
+            ));
         }
-        return routes;
+        System.out.println("Fetched " + routes.size() + " routes for account ID: " + accountId);
+    } catch (SQLException e) {
+        System.err.println("Error displaying user's saved routes: " + e.getMessage());
+        e.printStackTrace();
     }
+    return routes;
+}
 
     //💗💗💗 PLANNED DRIVES TABLE DISPLAY
     public ObservableList<UserPlannedDrives> getPlannedDrives(int accountId) {
         ObservableList<UserPlannedDrives> drives = FXCollections.observableArrayList();
-        String query = "SELECT * FROM WazePlannedDrives  ORDER BY planneddrive_id DESC"; // Fixed query
+        String query = "SELECT * FROM WazePlannedDrives WHERE account_id = ? ORDER BY planneddrive_id DESC"; // Fixed query
                                                                                          // placeholder
 
         UserDatabaseHandler.getInstance();
         try (Connection conn = UserDatabaseHandler.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
+                    stmt.setInt(1, accountId); //passing the account id sa query 
 
-            // stmt.setInt(1, 1); // Properly passing accountId into the query
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -241,17 +246,17 @@ public class UserDatabaseHandler {
                         rs.getString("pinned_loc")));
             }
 
-            System.out.println("✅ Fetched " + drives.size() + " planned drives for account ID: " + accountId);
+            System.out.println("Fetched " + drives.size() + " planned drives for account ID: " + accountId);
 
         } catch (SQLException e) {
-            System.err.println("❌ Error fetching planned drives: " + e.getMessage());
+            System.err.println("Error fetching planned drives: " + e.getMessage());
             e.printStackTrace();
         }
 
         return drives;
     }
 
-    public static ObservableList<String> getAllLocations() {
+    public static ObservableList<String> getAllLocations() { //FOR COMBOBOX CHOICES 
         ObservableList<String> locations = FXCollections.observableArrayList();
         String query = "SELECT name FROM locations";
         UserDatabaseHandler.getInstance();
@@ -267,7 +272,7 @@ public class UserDatabaseHandler {
         return locations;
     }
 
-    public static ObservableList<String> getStopoverLocations() {
+    public static ObservableList<String> getStopoverLocations() { //FOR COMBOBOX CHOICES
         ObservableList<String> stopovers = FXCollections.observableArrayList();
         String query = "SELECT name FROM stopoverlocations";
 
@@ -287,19 +292,49 @@ public class UserDatabaseHandler {
 
     //💗💗💗 DELETE FUNCTIONS
     public static boolean deleteUserRoute(String routeID) {
-        String query = "DELETE FROM WazeRoutes WHERE route_id = ?";
-
-        try (Connection connection = getInstance().getConnection();
-                PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, routeID);
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                System.out.println("✅ Route deleted successfully: " + routeID);
-                return true;
-            } else {
-                System.out.println("⚠ No route found with ID: " + routeID);
+        if (routeID == null || routeID.trim().isEmpty()) {
+            System.err.println("❌ Cannot delete: Route ID is null or empty.");
+            return false;
+        }
+    
+        routeID = routeID.trim(); // Remove leading/trailing spaces
+        System.out.println("🛠 Attempting to delete route with ID: " + routeID);
+    
+        String deleteAltRoutesQuery = "DELETE FROM WazeAltRoutes WHERE route_id = ?";
+        String deleteTravelTimeQuery = "DELETE FROM WazeTravelTime WHERE route_id = ?";
+        String deleteRouteQuery = "DELETE FROM WazeRoutes WHERE route_id = ?";
+    
+        try (Connection connection = getInstance().getConnection()) {
+            if (connection == null || connection.isClosed()) {
+                System.err.println("❌ Database connection is unavailable.");
                 return false;
+            }
+    
+            connection.setAutoCommit(false); // Start transaction
+    
+            // Delete from dependent tables first
+            try (PreparedStatement pstmtAltRoutes = connection.prepareStatement(deleteAltRoutesQuery);
+                 PreparedStatement pstmtTravelTime = connection.prepareStatement(deleteTravelTimeQuery);
+                 PreparedStatement pstmtRoutes = connection.prepareStatement(deleteRouteQuery)) {
+    
+                pstmtAltRoutes.setString(1, routeID);
+                pstmtAltRoutes.executeUpdate();
+    
+                pstmtTravelTime.setString(1, routeID);
+                pstmtTravelTime.executeUpdate();
+    
+                pstmtRoutes.setString(1, routeID);
+                int affectedRows = pstmtRoutes.executeUpdate();
+    
+                if (affectedRows > 0) {
+                    connection.commit(); // Commit transaction
+                    System.out.println("✅ Route deleted successfully: " + routeID);
+                    return true;
+                } else {
+                    System.out.println("⚠ No route found with ID: " + routeID);
+                    connection.rollback(); // Rollback if nothing was deleted
+                    return false;
+                }
             }
         } catch (SQLException e) {
             System.err.println("❌ Error deleting user route: " + e.getMessage());
@@ -307,6 +342,8 @@ public class UserDatabaseHandler {
             return false;
         }
     }
+    
+    
 
     public static boolean deleteUserPlannedDrive(int plannedDriveId) {
         String query = "DELETE FROM WazePlannedDrives WHERE planneddrive_id = ?";
@@ -345,18 +382,20 @@ public class UserDatabaseHandler {
         }
         return locations;
     }
-    ///💗💗💗 ADD FUNCTIONS
-    public static boolean addUserPlannedDrive(UserPlannedDrives newPlannedDrive) {
 
-        String query = "INSERT INTO WazePlannedDrives ( planned_date, planned_time,start_loc, pinned_loc) VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            // pstmt.setString(1, plannedDriveID);
-            // pstmt.setInt(2, newPlannedDrive.getAccountId());
-            pstmt.setString(2, newPlannedDrive.getStartLoc());
-            pstmt.setString(3, newPlannedDrive.getPinnedLoc());
-            pstmt.setDate(4, newPlannedDrive.getPlannedDate());
-            pstmt.setTime(5, newPlannedDrive.getPlannedTime());
+    ///💗💗💗 PLANNED DRIVES
+    public static boolean addUserPlannedDrive(int accountId, UserPlannedDrives newPlannedDrive, String plannedDriveID) {
+    
+            String query = "INSERT INTO WazePlannedDrives (account_id, planned_date, planned_time,start_loc, pinned_loc) VALUES (?, ?, ?, ?, ?)";
+    
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                pstmt.setString(1, plannedDriveID);
+            pstmt.setInt(2, newPlannedDrive.getAccountId());
+            pstmt.setString(3, newPlannedDrive.getStartLoc());
+            pstmt.setString(4, newPlannedDrive.getPinnedLoc());
+            pstmt.setDate(5, newPlannedDrive.getPlannedDate());
+            pstmt.setTime(6, newPlannedDrive.getPlannedTime());
 
             pstmt.executeUpdate();
             return true;
@@ -366,6 +405,104 @@ public class UserDatabaseHandler {
         }
         return false;
     }
+
+
+
+
+
+
+    //💗💗💗 ADD ROUTE 
+    public static boolean addRoutes(int accountId, UserRouteDetails newRoute, List<String> locationList) {
+        if (locationList == null || locationList.isEmpty()) {
+            System.err.println("❌ Error: locationList is null or empty.");
+            return false;
+        }
+
+        Connection conn = null;
+        PreparedStatement pstmtRoutes = null;
+        PreparedStatement pstmtAltRoutes = null;
+        PreparedStatement pstmtTravelTime = null;
+        PreparedStatement pstmtCheckAccount = null;
+
+        String routeID = GenerateID.generateID("WazeRoutes", "ROUTE");
+        String insertRouteQuery = "INSERT INTO WazeRoutes (route_id, account_id, route_startpoint, route_endpoint) VALUES (?, ?, ?, ?)";
+        String insertAltRouteQuery = "INSERT INTO WazeAltRoutes (alt_route_id, route_id, alt_routes, stop_overloc) VALUES (?, ?, ?, ?)";
+        String insertTravelTimeQuery = "INSERT INTO WazeTravelTime (traveltime_id, route_id, est_time) VALUES (?, ?, ?)";
+
+        try {
+            conn = UserDatabaseHandler.getInstance().getConnection();
+            if (conn == null || conn.isClosed()) {
+                throw new SQLException("Connection is not available or already closed.");
+            }
+
+            conn.setAutoCommit(false); // Start transaction
+
+            // Insert into WazeRoutes
+            pstmtRoutes = conn.prepareStatement(insertRouteQuery);
+            pstmtRoutes.setString(1, newRoute.getRouteId()); 
+            pstmtRoutes.setInt(2, accountId);  // ✅ Assign the route to the logged-in user
+            pstmtRoutes.setString(3, newRoute.getStartPoint());
+            pstmtRoutes.setString(4, newRoute.getEndPoint());
+            pstmtRoutes.executeUpdate();
+
+            String altRouteID = RouteIDGenerator.generateAltRouteID();
+            String alternativeRoute = RouteIDGenerator.generateRandomAlternativeRoute(
+                    newRoute.getStartPoint(),
+                    newRoute.getEndPoint(),
+                    locationList);
+
+            // Set stopover to "No Stopover" if it's null or empty
+            String stopover = (newRoute.getStopOverLocation() == null || newRoute.getStopOverLocation().isEmpty())
+                    ? "No Stopover"
+                    : newRoute.getStopOverLocation();
+
+            // Insert into WazeAltRoutes
+            pstmtAltRoutes = conn.prepareStatement(insertAltRouteQuery);
+            pstmtAltRoutes.setString(1, altRouteID);
+            pstmtAltRoutes.setString(2, newRoute.getRouteId());
+            pstmtAltRoutes.setString(3, alternativeRoute);
+            pstmtAltRoutes.setString(4, stopover);
+            pstmtAltRoutes.executeUpdate();
+
+            // Insert into WazeTravelTime
+            pstmtTravelTime = conn.prepareStatement(insertTravelTimeQuery);
+            pstmtTravelTime.setString(1, "T_T-" + String.format("%03d", new Random().nextInt(999))); // Random travel time ID
+            pstmtTravelTime.setString(2, newRoute.getRouteId());
+            pstmtTravelTime.setString(3, RouteIDGenerator.generateRandomEstTime());
+            pstmtTravelTime.executeUpdate();
+
+            conn.commit(); // Commit transaction
+            System.out.println("✅ Route added successfully.");
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback changes on failure
+                    System.err.println("⚠️ SDF rolled back.");
+                } catch (SQLException rollbackEx) {
+                    System.err.println("RRF: " + rollbackEx.getMessage());
+                }
+            }
+            System.err.println("❌ Error adding route: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+
+        } finally {
+            try {
+                if (pstmtRoutes != null) pstmtRoutes.close();
+                if (pstmtAltRoutes != null) pstmtAltRoutes.close();
+                if (pstmtTravelTime != null) pstmtTravelTime.close();
+                if (conn != null && !conn.isClosed()) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException closeEx) {
+                System.err.println("Error closing resources: " + closeEx.getMessage());
+            }
+        }
+    }
+
 
     //💅💅💅 
     public static boolean deleteUserPlannedDrive(String driveID) {
@@ -382,7 +519,7 @@ public class UserDatabaseHandler {
         return false;
     }
 
-    // 💅💅💅 UPDATE FUNCTIONS
+  
     public static ObservableList<UserPlannedDrives> displayPlannedDrives() {
         ObservableList<UserPlannedDrives> plannedDriveList = FXCollections.observableArrayList();
         String query = "SELECT planneddrive_id, account_id, planned_date, planned_time, start_loc, pinned_loc FROM WazePlannedDrives";
@@ -410,59 +547,77 @@ public class UserDatabaseHandler {
     }
 
     public static boolean updateUserRoute(UserRouteDetails route) {
-        UserDatabaseHandler handler = UserDatabaseHandler.getInstance();
-        Connection connection = handler.getConnection(); // Ensure active connection
-
-        if (connection == null || handler.isConnectionClosed()) {
-            System.out.println("⚠ Failed to update route: No database connection.");
+        if (route == null || route.getRouteId() == null) {
+            System.out.println("❌ Error: Invalid route. Cannot update.");
             return false;
         }
-
-        String query = "UPDATE WazeRoutes SET route_startpoint = ?, route_endpoint = ?, alt_routes = ?, stop_overloc = ?, est_time = ? WHERE route_id = ?";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, route.getStartPoint());
-            pstmt.setString(2, route.getEndPoint());
-            pstmt.setString(3, route.getAlternativeRoutes());
-            pstmt.setString(4, route.getStopOverLocation());
-            pstmt.setTime(5, route.getEstimatedTime());
-            pstmt.setString(6, route.getRouteId());
-
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("✅ Route updated successfully.");
-                return true;
+    
+        boolean success = false;
+        
+        String updateRoutesQuery = "UPDATE WazeRoutes SET route_startpoint = ?, route_endpoint = ? WHERE route_id = ?";
+        String updateAltRoutesQuery = "UPDATE WazeAltRoutes SET stop_overloc = ? WHERE route_id = ?";
+        
+        try (Connection conn = DatabaseHandler.getConnection();
+             PreparedStatement pstmtRoutes = conn.prepareStatement(updateRoutesQuery);
+             PreparedStatement pstmtAltRoutes = conn.prepareStatement(updateAltRoutesQuery)) {
+            
+            conn.setAutoCommit(false);
+    
+            pstmtRoutes.setString(1, route.getStartPoint());
+            pstmtRoutes.setString(2, route.getEndPoint());
+            pstmtRoutes.setString(3, route.getRouteId().trim());
+    
+            pstmtAltRoutes.setString(1, route.getStopOverLocation());
+            pstmtAltRoutes.setString(2, route.getRouteId().trim());
+    
+            int rowsAffectedRoutes = pstmtRoutes.executeUpdate();
+            int rowsAffectedAltRoutes = pstmtAltRoutes.executeUpdate();
+    
+            if (rowsAffectedRoutes > 0 || rowsAffectedAltRoutes > 0) {
+                conn.commit();
+                success = true;
+                System.out.println("Route update successful.");
             } else {
-                System.out.println("⚠ No route found with the given ID.");
+                System.out.println("No update made. Check route ID & values.");
             }
         } catch (SQLException e) {
-            System.err.println("❌ Error updating route: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("❌ SQL Error updating route: " + e.getMessage());
         }
-        return false;
+        
+        return success;
     }
 
+    // UPDATE - PLANNED DRIVES
     public static boolean updateUserPlannedDrive(UserPlannedDrives plannedDrive) {
         UserDatabaseHandler handler = UserDatabaseHandler.getInstance();
         Connection connection = handler.getConnection(); // Ensure active connection
-
+    
         if (connection == null || handler.isConnectionClosed()) {
             System.out.println("⚠ Failed to update planned drive: No database connection.");
             return false;
         }
-
-        String query = "UPDATE WazePlannedDrives SET planned_date = ?, planned_time = ?, start_loc = ?, pinned_loc = ? WHERE planneddrive_id = ?";
-
+    
+        String query = "UPDATE WazePlannedDrives SET start_loc = ?, pinned_loc = ?, planned_date = ?, planned_time = ? WHERE planneddrive_id = ?";
+    
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setDate(1, plannedDrive.getPlannedDate());
-            pstmt.setString(2, plannedDrive.getStartLoc());
-            pstmt.setString(3, plannedDrive.getPinnedLoc());
-            pstmt.setTime(4, plannedDrive.getPlannedTime());
+            pstmt.setString(1, plannedDrive.getStartLoc());
+            pstmt.setString(2, plannedDrive.getPinnedLoc());
+            pstmt.setObject(3, plannedDrive.getPlannedDate()); // No timezone shifts
+            pstmt.setTime(4, plannedDrive.getPlannedTime()); 
             pstmt.setInt(5, plannedDrive.getPlannedDriveID());
-
+            
+            // **Debug print before executing update**
+            System.out.println("🔄 Executing UPDATE Query:");
+            System.out.println("SQL: " + query);
+            System.out.println("Start Location: " + plannedDrive.getStartLoc());
+            System.out.println("End Location: " + plannedDrive.getPinnedLoc());
+            System.out.println("Date: " + plannedDrive.getPlannedDate());
+            System.out.println("Time: " + plannedDrive.getPlannedTime());
+            System.out.println("Drive ID: " + plannedDrive.getPlannedDriveID());
+    
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("✅ Planned drive updated successfully.");
+                System.out.println("✅ Planned drive details updated successfully.");
                 return true;
             } else {
                 System.out.println("⚠ No planned drive found with the given ID.");
@@ -473,116 +628,10 @@ public class UserDatabaseHandler {
         }
         return false;
     }
-
+    
     // Add Routes
     // +
-    public static boolean addRoutes(UserRouteDetails newRoute, List<String> locationList) {
-        if (locationList == null || locationList.isEmpty()) {
-            System.err.println("❌ Error: locationList is null or empty.");
-            return false;
-        }
-
-        Connection conn = null;
-        PreparedStatement pstmtRoutes = null;
-        PreparedStatement pstmtAltRoutes = null;
-        PreparedStatement pstmtTravelTime = null;
-        PreparedStatement pstmtCheckAccount = null;
-
-        String routeID = GenerateID.generateID("WazeRoutes", "ROUTE");
-        String insertRouteQuery = "INSERT INTO WazeRoutes (route_id, account_id, route_startpoint, route_endpoint) VALUES (?, ?, ?, ?)";
-        String insertAltRouteQuery = "INSERT INTO WazeAltRoutes (alt_route_id, route_id, alt_routes, stop_overloc) VALUES (?, ?, ?, ?)";
-        String insertTravelTimeQuery = "INSERT INTO WazeTravelTime (traveltime_id, route_id, est_time) VALUES (?, ?, ?)";
-        String checkAccountQuery = "SELECT COUNT(*) FROM WazeAccounts WHERE account_id = ?";
-
-        try {
-            conn = UserDatabaseHandler.getInstance().getConnection();
-            if (conn == null || conn.isClosed()) {
-                throw new SQLException("Connection is not available or already closed.");
-            }
-
-            // Check if account_id exists
-            pstmtCheckAccount = conn.prepareStatement(checkAccountQuery);
-            pstmtCheckAccount.setInt(1, 1); // +
-            ResultSet rs = pstmtCheckAccount.executeQuery();
-            rs.next();
-            if (rs.getInt(1) == 0) {
-                System.err.println("❌ Error: Account ID not found in WazeAccounts table.");
-                return false;
-            }
-
-            conn.setAutoCommit(false); // Start transaction
-
-            // Insert into WazeRoutes
-            pstmtRoutes = conn.prepareStatement(insertRouteQuery);
-            pstmtRoutes.setString(1, routeID);
-            pstmtRoutes.setInt(2, 1);
-            pstmtRoutes.setString(3, newRoute.getStartPoint());
-            pstmtRoutes.setString(4, newRoute.getEndPoint());
-            pstmtRoutes.executeUpdate();
-
-            String altRouteID = GenerateID.generateAltRouteID();
-            String alternativeRoute = GenerateID.generateRandomAlternativeRoute(
-                    newRoute.getStartPoint(),
-                    newRoute.getEndPoint(),
-                    locationList);
-
-            // Set stopover to "No Stopover" if it's null or empty
-            String stopover = (newRoute.getStopOverLocation() == null || newRoute.getStopOverLocation().isEmpty())
-                    ? "No Stopover"
-                    : newRoute.getStopOverLocation();
-
-            // Insert into WazeAltRoutes
-            pstmtAltRoutes = conn.prepareStatement(insertAltRouteQuery);
-            pstmtAltRoutes.setString(1, altRouteID);
-            pstmtAltRoutes.setString(2, routeID);
-            pstmtAltRoutes.setString(3, alternativeRoute);
-            pstmtAltRoutes.setString(4, stopover);
-            pstmtAltRoutes.executeUpdate();
-
-            // Insert into WazeTravelTime
-            pstmtTravelTime = conn.prepareStatement(insertTravelTimeQuery);
-            pstmtTravelTime.setString(1, GenerateID.generateID("WazeTravelTime", "T_T-"));
-            pstmtTravelTime.setString(2, routeID);
-            pstmtTravelTime.setString(3, GenerateID.generateRandomEstTime());
-            pstmtTravelTime.executeUpdate();
-
-            conn.commit(); // Commit transaction
-            UserDatabaseHandler.getInstance().getUserRouteDetails(1); // Refresh the list of user routes
-            System.out.println("✅ Route added successfully.");
-            return true;
-
-        } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback changes on failure
-                    System.err.println("⚠️ Transaction rolled back.");
-                } catch (SQLException rollbackEx) {
-                    System.err.println("Rollback failed: " + rollbackEx.getMessage());
-                }
-            }
-            System.err.println("❌ Error adding route: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-
-        } finally {
-            try {
-                if (pstmtCheckAccount != null)
-                    pstmtCheckAccount.close();
-                if (pstmtRoutes != null)
-                    pstmtRoutes.close();
-                if (pstmtAltRoutes != null)
-                    pstmtAltRoutes.close();
-                if (pstmtTravelTime != null)
-                    pstmtTravelTime.close();
-                if (conn != null && !conn.isClosed()) {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                }
-            } catch (SQLException closeEx) {
-                System.err.println("Error closing resources: " + closeEx.getMessage());
-            }
-        }
-    }
+    
 
     // Updates last login time for a user
     public static void updateLastLogin(String username) {
@@ -602,49 +651,52 @@ public class UserDatabaseHandler {
         }
     }
 
-    public static String validateLogin(String username, String password) {
-        String queryAdmin = "SELECT * FROM Admins WHERE username = ? AND password = ?";
-        String queryUser = "SELECT * FROM Users WHERE username = ? AND password = ?";
-
-        try (Connection conn = UserDatabaseHandler.getInstance().getConnection();
-                PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
-                PreparedStatement stmtUser = conn.prepareStatement(queryUser)) {
-
-            stmtAdmin.setString(1, username);
-            stmtAdmin.setString(2, password);
-            ResultSet rsAdmin = stmtAdmin.executeQuery();
-            if (rsAdmin.next()) {
-                return "admin";
+    public static boolean validateLogin(String username, String password, int AccountUserID) {
+            Connection conn = DatabaseHandler.getInstance().getConnection(); // Ensure connection is valid
+         
+            if (conn == null) {
+                System.err.println("No database connection. Cannot validate login.");
+                return false;
             }
-
-            stmtUser.setString(1, username);
-            stmtUser.setString(2, password);
-            ResultSet rsUser = stmtUser.executeQuery();
-            if (rsUser.next()) {
-                return "user";
+            String query = "SELECT * FROM WazeAccounts WHERE Username = ? AND Passwords = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
+                try (ResultSet result = pstmt.executeQuery()) {
+                    if (result.next()) {
+                        AccountUserID = result.getInt("account_id");
+                    return true;
+                }
             }
-
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error validating login: " + e.getMessage());
         }
-
-        return "invalid";
+        return false;
     }
     
     public static int getUserId(String username) {
+        int accountId = 0;
         String query = "SELECT account_id FROM WazeAccounts WHERE username = ?";
+    
         try (Connection conn = UserDatabaseHandler.getInstance().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+    
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+    
             if (rs.next()) {
-                return rs.getInt("account_id");
+                accountId = rs.getInt("account_id");
             }
+    
+            System.out.println("🔍 [DEBUG] Fetched account ID from DB: " + accountId); // Debugging log
+    
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("❌ Error fetching account ID: " + e.getMessage());
         }
-        return 0;
+    
+        return accountId;
     }
+    
 
 
     //FOR USER ACCOUNT'S DELETE AND UPDATE ❗❗❗

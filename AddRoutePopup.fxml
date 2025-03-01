@@ -10,7 +10,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="400.0" style="-fx-background-color: #14cdff;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AddRoutesPopupController">
    <children>
-      <AnchorPane layoutX="-1.0" minWidth="-Infinity" prefHeight="27.0" prefWidth="400.0" style="-fx-background-color: white; -fx-border-color: lightgrey;">
+      <AnchorPane layoutX="-1.0" minWidth="-Infinity" prefHeight="27.0" prefWidth="400.0" style="-fx-background-color: white; -fx-border-color: lightgrey; -fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
          <children>
             <ImageView fitHeight="25.0" fitWidth="24.0" layoutX="5.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -19,19 +19,19 @@
             </ImageView>
          </children>
       </AnchorPane>
-      <Label layoutX="88.0" layoutY="42.0" text="Add new Saved Routes:" textFill="WHITE">
+      <Label layoutX="88.0" layoutY="42.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.0, 2, 2);" text="Add new Saved Routes:" textFill="WHITE">
          <font>
             <Font name="Segoe UI Black Italic" size="19.0" />
          </font>
       </Label>
-      <Button fx:id="saveRouteBTN" layoutX="152.0" layoutY="256.0" mnemonicParsing="false" onAction="#handleAddRoute" style="-fx-background-color: #0095FF;" text="Save Route" textFill="WHITE">
+      <Button fx:id="saveRouteBTN" layoutX="152.0" layoutY="256.0" mnemonicParsing="false" onAction="#handleAddRoute" style="-fx-background-color: #0095FF; -fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Save Route" textFill="WHITE">
          <font>
             <Font name="Segoe UI Bold" size="12.0" />
          </font>
       </Button>
-      <ComboBox fx:id="accountIDCombobox" editable="true" layoutX="110.0" layoutY="89.0" prefHeight="26.0" prefWidth="180.0" promptText="Users" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
-      <ComboBox fx:id="startPointComboBox" editable="true" layoutX="110.0" layoutY="126.0" onAction="#onStartPointSelected" prefHeight="26.0" prefWidth="180.0" promptText="Startpoint location" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
-      <ComboBox fx:id="stopOverCombobox" editable="true" layoutX="111.0" layoutY="205.0" onAction="#onStopOverSelected" prefHeight="26.0" prefWidth="180.0" promptText="Stop over location" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
-      <ComboBox fx:id="endPointCombobox" editable="true" layoutX="111.0" layoutY="166.0" onAction="#onEndPointSelected" prefHeight="26.0" prefWidth="180.0" promptText="Endpoint location" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+      <ComboBox fx:id="accountIDCombobox" editable="true" layoutX="110.0" layoutY="89.0" prefHeight="26.0" prefWidth="180.0" promptText="Users" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+      <ComboBox fx:id="startPointComboBox" editable="true" layoutX="110.0" layoutY="126.0" onAction="#onStartPointSelected" prefHeight="26.0" prefWidth="180.0" promptText="Startpoint location" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+      <ComboBox fx:id="stopOverCombobox" editable="true" layoutX="111.0" layoutY="205.0" onAction="#onStopOverSelected" prefHeight="26.0" prefWidth="180.0" promptText="Stop over location" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+      <ComboBox fx:id="endPointCombobox" editable="true" layoutX="111.0" layoutY="166.0" onAction="#onEndPointSelected" prefHeight="26.0" prefWidth="180.0" promptText="Endpoint location" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
    </children>
 </AnchorPane>

@@ -8,21 +8,20 @@ import java.util.List;
 import java.util.Random;
 
 public class RouteIDGenerator {
-    private static int routeCounter = getLastRouteCounter() + 1; // Get last used ID from DB
-    private static int altRouteCounter = getLastAltRouteID() + 1; // Get last alt ID from DB
+    private static int routeCounter = getLastRouteCounter() + 1;
+    private static int altRouteCounter = getLastAltRouteID() + 1;
 
     public static String generateRouteID(String startLocation, String endLocation) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String currentDate = sdf.format(new Date());
 
-        routeCounter = getLastRouteCounter() + 1; // Fetch latest route ID from DB
+        routeCounter = getLastRouteCounter() + 1; // Ensure fresh ID fetching
         return "WZE-RTS-" + currentDate + "-" + String.format("%03d", routeCounter++);
-    }    
+    }
 
     public static String generateAltRouteID() {
-        String altRouteID = "ALT-" + String.format("%03d", altRouteCounter);
-        altRouteCounter++; 
-        return altRouteID;
+        altRouteCounter = getLastAltRouteID() + 1; // Always get the latest ID
+        return String.format("ALT-%03d", altRouteCounter++);
     }
 
     public static String generateRandomEstTime() {
@@ -33,12 +32,12 @@ public class RouteIDGenerator {
     }
 
     public static String generateRandomAlternativeRoute(String start, String end, List<String> locationList) {
-        List<String> filteredLocations = new ArrayList<>(locationList); 
+        List<String> filteredLocations = new ArrayList<>(locationList);
         filteredLocations.remove(start);
         filteredLocations.remove(end);
 
         if (filteredLocations.isEmpty()) {
-            return "No Alternative Route"; 
+            return "No Alternative Route";
         }
 
         String randomLocation = filteredLocations.get(new Random().nextInt(filteredLocations.size()));
@@ -47,17 +46,14 @@ public class RouteIDGenerator {
 
     private static int getLastAltRouteID() {
         int lastID = 0;
-        String query = "SELECT MAX(alt_route_id) FROM WazeAltRoutes";
+        String query = "SELECT MAX(CAST(SUBSTRING_INDEX(alt_route_id, '-', -1) AS UNSIGNED)) FROM WazeAltRoutes";
 
         try (Connection conn = DatabaseHandler.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {
 
             if (rs.next()) {
-                String lastAltID = rs.getString(1);
-                if (lastAltID != null) {
-                    lastID = Integer.parseInt(lastAltID.split("-")[1]);
-                }
+                lastID = rs.getInt(1);
             }
         } catch (Exception e) {
             System.err.println("Error fetching last alternative route ID: " + e.getMessage());
@@ -67,27 +63,24 @@ public class RouteIDGenerator {
 
     private static int getLastRouteCounter() {
         int lastID = 0;
-        String query = "SELECT route_id FROM WazeRoutes WHERE route_id LIKE ? ORDER BY route_id DESC LIMIT 1";
-    
+        String query = "SELECT MAX(CAST(SUBSTRING_INDEX(route_id, '-', -1) AS UNSIGNED)) FROM WazeRoutes WHERE route_id LIKE ?";
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String currentDate = sdf.format(new Date());
-    
+
         try (Connection conn = DatabaseHandler.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-    
+
             pstmt.setString(1, "WZE-RTS-" + currentDate + "-%");
             ResultSet rs = pstmt.executeQuery();
-    
+
             if (rs.next()) {
-                String lastRouteID = rs.getString("route_id");
-                if (lastRouteID != null) {
-                    lastID = Integer.parseInt(lastRouteID.split("-")[3]);
-                }
+                lastID = rs.getInt(1);
             }
         } catch (Exception e) {
             System.err.println("Error fetching last route counter: " + e.getMessage());
         }
-    
+
         return lastID;
     }
 }

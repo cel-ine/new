@@ -11,19 +11,19 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="270.0" prefWidth="371.0" style="-fx-background-color: #14cdff;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AddUserPopupController">
-     <TextField fx:id="emailField" layoutX="97.0" layoutY="94.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" promptText="Email" />
-     <TextField fx:id="usernameField" layoutX="97.0" layoutY="55.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="180.0" promptText="Username" />
-     <PasswordField fx:id="passwordField" layoutX="97.0" layoutY="196.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" promptText="Password" />
-     <TextField fx:id="lastNameField" layoutX="193.0" layoutY="131.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="84.0" promptText="Last Name" />
-     <Button fx:id="addUserBTN" layoutX="152.0" layoutY="231.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleAddUser" style="-fx-background-color: #0095FF;" text="Add User" textFill="WHITE">
+     <TextField fx:id="emailField" layoutX="97.0" layoutY="94.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" promptText="Email" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+     <TextField fx:id="usernameField" layoutX="97.0" layoutY="55.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="180.0" promptText="Username" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+     <PasswordField fx:id="passwordField" layoutX="97.0" layoutY="196.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" promptText="Password" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+     <TextField fx:id="lastNameField" layoutX="193.0" layoutY="131.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="84.0" promptText="Last Name" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+     <Button fx:id="addUserBTN" layoutX="152.0" layoutY="231.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleAddUser" style="-fx-background-color: #0095FF; -fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);" text="Add User" textFill="WHITE">
       <font>
          <Font name="Segoe UI Bold" size="12.0" />
       </font>
    </Button>
-     <DatePicker fx:id="birthdatePicker" layoutX="97.0" layoutY="163.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" />
-     <TextField fx:id="firstNameField" layoutX="97.0" layoutY="131.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="84.0" promptText="First Name" />
+     <DatePicker fx:id="birthdatePicker" layoutX="97.0" layoutY="163.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="180.0" promptText="Select birthdate" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
+     <TextField fx:id="firstNameField" layoutX="97.0" layoutY="131.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="84.0" promptText="First Name" style="-fx-effect: innershadow(gaussian, rgba(170, 170, 170, 0.5), 5, 0.0, 2, 2);" />
    <Label layoutX="22.0" layoutY="24.0" />
-   <AnchorPane prefHeight="25.0" prefWidth="371.0" style="-fx-background-color: white;">
+   <AnchorPane prefHeight="25.0" prefWidth="371.0" style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(136, 136, 136, 0.5), 10, 0.0, 3, 3);">
       <children>
          <ImageView fitHeight="25.0" fitWidth="45.0" layoutX="5.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
             <image>
@@ -32,7 +32,7 @@
          </ImageView>
       </children>
    </AnchorPane>
-   <Label layoutX="119.0" layoutY="33.0" text="Input New User Info:" textFill="WHITE">
+   <Label layoutX="119.0" layoutY="33.0" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.0, 2, 2);" text="Input New User Info:" textFill="WHITE">
       <font>
          <Font name="Segoe UI Black" size="12.0" />
       </font>
